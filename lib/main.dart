@@ -312,11 +312,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemCount: ventas.length,
                       itemBuilder: (context, index) {
                         final venta = ventas[index];
+                        print('Venta en el índice $index: $venta');
                         return buildSalesListItem(
-                          title: venta['fechaVenta'] ?? 'Producto',
+                          title: venta['nombreServicio'] ?? 'Producto',
                           imageUrl: venta['imgServicio'] ?? '',
-                          subtitle: '\$${venta['precioServicio'] ?? '0'}',
+                          subtitle: venta['precioServicio'] ?? '0',
                           onVisibilityTap: () {
+                            print('Tapped visibility for venta: $venta');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -329,7 +331,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             );
                           },
                           onCancelTap: () {
-                            // Acción al cancelar la venta
+                            _onCancelTap(index);
                           },
                         );
                       },
@@ -343,6 +345,29 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: _onTabTapped,
       ),
     );
+  }
+
+  void _onCancelTap(int index) async {
+    try {
+      // Verificar que el índice esté dentro del rango de la lista de ventas
+      if (index < 0 || index >= ventas.length) {
+        print('Índice de venta fuera de rango');
+        return;
+      }
+
+      // Obtener el ID de la venta del elemento seleccionado en la lista
+      final ventaId = ventas[index]['idVenta'];
+
+      // Llamar al método en DatabaseHelper para eliminar la venta por su ID
+      DBHelper.DatabaseHelper databaseHelper = DBHelper.DatabaseHelper();
+      await databaseHelper.deleteVenta(ventaId);
+
+      // Actualizar la lista de ventas después de eliminar el registro
+      await _loadVentas();
+    } catch (e) {
+      print('Error al eliminar la venta: $e');
+      // Manejar cualquier error que ocurra durante la eliminación
+    }
   }
 
   void _onTabTapped(int index) {

@@ -32,7 +32,7 @@ class DatabaseHelper {
     // Crear tabla Venta
     await db.execute('''
       CREATE TABLE Venta (
-        idVenta INTEGER PRIMARY KEY,
+        idVenta INTEGER PRIMARY KEY AUTOINCREMENT,
         empleadoId INTEGER,
         clienteId INTEGER,
         servicioId INTEGER,
@@ -328,9 +328,30 @@ class DatabaseHelper {
     Database db = await database;
     return await db.rawQuery('''
     SELECT V.idVenta, V.empleadoId, V.clienteId, V.servicioId, V.horaServicio, V.fechaVenta, V.estadoVenta,
-           S.nombre AS nombreServicio, S.imageUrl AS imageUrl
+           S.nombreServicio AS nombreServicio, S.imgServicio AS imageUrl
     FROM Venta V
     INNER JOIN Servicio S ON V.servicioId = S.idServicio
   ''');
+  }
+
+  Future<void> deleteVenta(int idVenta) async {
+    try {
+      Database db = await database;
+      int rowsAffected = await db.delete(
+        'Venta', // Nombre de la tabla de la cual eliminar registros
+        where:
+            'idVenta = ?', // Condición para identificar el registro a eliminar
+        whereArgs: [idVenta], // Valor del ID de la venta a eliminar
+      );
+
+      if (rowsAffected > 0) {
+        print('Venta eliminada exitosamente');
+      } else {
+        print('No se encontró ninguna venta con el ID especificado');
+      }
+    } catch (e) {
+      print('Error al eliminar la venta: $e');
+      throw Exception('Error al eliminar la venta');
+    }
   }
 }

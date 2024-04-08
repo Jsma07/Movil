@@ -6,7 +6,6 @@ import 'package:sqflite/sqflite.dart';
 import 'Databasehelper.dart' as DBHelper;
 
 class Venta {
-  int idVenta;
   int empleadoId;
   int clienteId;
   int servicioId;
@@ -15,7 +14,6 @@ class Venta {
   int estadoVenta;
 
   Venta({
-    required this.idVenta,
     required this.empleadoId,
     required this.clienteId,
     required this.servicioId,
@@ -26,7 +24,6 @@ class Venta {
 
   Map<String, dynamic> toMap() {
     return {
-      'idVenta': idVenta,
       'empleadoId': empleadoId,
       'clienteId': clienteId,
       'servicioId': servicioId,
@@ -52,6 +49,7 @@ class _CrearVentaState extends State<CrearVenta> {
   List<Map<String, dynamic>> empleados = [];
   List<Map<String, dynamic>> servicios = [];
   List<Map<String, dynamic>> adiciones = [];
+  List<Map<String, dynamic>> ventas = [];
 
   final _formKey = GlobalKey<FormState>();
   DateTime _fechaVenta = DateTime.now();
@@ -76,43 +74,68 @@ class _CrearVentaState extends State<CrearVenta> {
     });
   }
 
-  Future<void> _cargarServicios() async {
-    Database db = await _databaseHelper.database;
-    List<Map<String, dynamic>> serviciosList = await db.query('Servicio');
-
-    // Actualizar el estado del widget con los datos recuperados
-    setState(() {
-      servicios = serviciosList;
-    });
+  Future<void> _loadVentas() async {
+    try {
+      DBHelper.DatabaseHelper databaseHelper = DBHelper.DatabaseHelper();
+      List<Map<String, dynamic>> ventasData = await databaseHelper.getVentas();
+      setState(() {
+        ventas = ventasData;
+      });
+    } catch (e) {
+      print('Error al cargar las ventas: $e');
+    }
   }
 
-  void _guardarVenta() async {
+  Future<void> _cargarServicios() async {
+    try {
+      Database db = await _databaseHelper.database;
+      List<Map<String, dynamic>> serviciosList = await db.query('Servicio');
+
+      setState(() {
+        servicios = serviciosList;
+      });
+    } catch (e) {
+      print('Error al cargar servicios: $e');
+    }
+  }
+
+  void _guardarVenta(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      Venta nuevaVenta = Venta(
-        idVenta: 0, // El ID se asignará automáticamente en la base de datos
-        empleadoId: _empleadoId!,
-        clienteId: _clienteId!,
-        servicioId: _servicioId!,
-        horaServicio: _fechaVenta,
-        fechaVenta: _fechaVenta,
-        estadoVenta: 1,
-      );
+      try {
+        Venta nuevaVenta = Venta(
+          // El ID se asignará automáticamente en la base de datos
+          empleadoId: _empleadoId!,
+          clienteId: _clienteId!,
+          servicioId: _servicioId!,
+          horaServicio: _fechaVenta,
+          fechaVenta: _fechaVenta,
+          estadoVenta: 1,
+        );
 
-      // Esperar la inserción en la base de datos
-      await _databaseHelper.insertVenta(nuevaVenta.toMap());
+        await _databaseHelper.insertVenta(nuevaVenta.toMap());
 
-      // Mostrar SnackBar después de la inserción
-      ScaffoldMessenger.of(context as BuildContext).showSnackBar(
-        SnackBar(
-          content: Text('Venta registrada correctamente'),
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Venta registrada correctamente'),
+          ),
+        );
 
-      // Redirigir a la página principal después de la inserción
-      Navigator.pushReplacement(
-        context as BuildContext,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
-      );
+        // Redirigir solo si la inserción fue exitosa
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage()),
+        ).then((_) {
+          // Actualizar la lista de ventas al volver a MyHomePage
+          _loadVentas();
+        });
+      } catch (e) {
+        print('Error al guardar la venta: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar la venta'),
+          ),
+        );
+      }
     }
   }
 
@@ -474,7 +497,10 @@ class _CrearVentaState extends State<CrearVenta> {
                               SizedBox(
                                 width: 140,
                                 child: ElevatedButton(
-                                  onPressed: _guardarVenta,
+                                  onPressed: () {
+                                    _guardarVenta(
+                                        context); // Llama directamente a la función _guardarVenta con el contexto actual
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue,
                                   ),
