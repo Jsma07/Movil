@@ -26,7 +26,7 @@ class _AdicionesState extends State<Adiciones> {
       DBHelper.DatabaseHelper databaseHelper =
           DBHelper.DatabaseHelper(); // Use DBHelper prefix
       adiciones = await databaseHelper
-          .getAdiciones(); // Método para obtener adiciones desde la base de datos
+          .getAdiciones(); // Obtener adiciones desde la base de datos
       setState(() {}); // Actualizar la interfaz después de cargar las adiciones
     } catch (e) {
       print('Error al cargar las adiciones: $e');
@@ -82,27 +82,34 @@ class _AdicionesState extends State<Adiciones> {
                 alignment: Alignment.topCenter,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 125.0),
-                  child: GridView.count(
-                    crossAxisCount: 2,
+                  child: GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                    ),
                     shrinkWrap: true,
-                    children: adiciones.map((adicion) {
-                      String imageUrl = (adicion['imagenInsumo'] ?? '').trim();
-
-                      String nombreInsumo = adicion['nombreInsumo'] ?? '';
+                    itemCount: adiciones.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      String imageUrl =
+                          (adiciones[index]['imagenInsumo'] ?? '').trim();
+                      String nombreInsumo =
+                          adiciones[index]['nombreInsumo'] ?? '';
 
                       return CustomCard(
                         key: UniqueKey(),
                         imageUrl: imageUrl,
                         title: nombreInsumo,
-                        subtitle: 'Cantidad: ${adicion['cantidadInsumo']}',
-                        usos: 'Usos disponibles: ${adicion['usosDisponibles']}',
+                        subtitle:
+                            'Cantidad: ${adiciones[index]['cantidadInsumo']}',
+                        usos:
+                            'Usos disponibles: ${adiciones[index]['usosDisponibles']}',
                         buttonText: 'Seleccionar',
                         onPressed: () {
                           // Acción cuando se presiona el botón de adición
                           // Aquí puedes implementar la lógica para seleccionar la adición
                         },
                       );
-                    }).toList(), // Convierte el iterable a una lista de Widgets
+                    },
                   ),
                 ),
               ),
@@ -208,90 +215,95 @@ class CustomCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(40.0),
       ),
       child: Container(
-        width: 150,
+        width:
+            200, // Anchura de la Card (puedes ajustar este valor si lo deseas)
+        height:
+            300, // Altura de la Card (puedes ajustar este valor para hacerla más grande)
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(40.0),
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(230, 166, 201, 235),
-              Color.fromARGB(184, 189, 220, 227),
-              Color.fromARGB(255, 234, 236, 236),
+              Color.fromARGB(230, 166, 201,
+                  235), // Color en la parte superior (azul aclarado)
+              Color.fromARGB(184, 189, 220, 227), // Color en el 40%
+              Color.fromARGB(255, 234, 236, 236), // Color en el 20%
             ],
-            stops: [0.0, 0.5, 0.8],
+            stops: [0.0, 0.5, 0.8], // Paradas de los colores
           ),
         ),
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+
+        padding: EdgeInsets.all(10.0),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
           children: [
-            SizedBox(
-              height: 80,
-              width: 80,
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    imageUrl, // Aquí asigna la URL de la imagen
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      // Opcional: Manejo de errores si la carga de la imagen falla
-                      return const Icon(Icons.people);
-                    },
+                    child: ClipOval(
+                      child: Image.network(
+                        imageUrl, // URL de la imagen
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Manejo de errores si la carga de la imagen falla
+                          return const Icon(Icons.people);
+                        },
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.black87,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 5),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onPressed,
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.blue,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 16,
+                SizedBox(height: 5), // Espacio entre la imagen y el texto
+                Text(
+                  title, // Título de la tarjeta
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  subtitle, // Subtítulo de la tarjeta
+                  style: TextStyle(fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10), // Espacio entre el precio y el botón
+                SizedBox(
+                  width: double
+                      .infinity, // Ajustar el ancho del contenedor al ancho de la tarjeta
+                  child: ElevatedButton(
+                    onPressed: onPressed, // Función al presionar el botón
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                      padding: EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 20), // Ajustar el padding del botón
+                    ),
+                    child: Text(
+                      buttonText, // Texto del botón
+                      style: TextStyle(
+                        fontSize: 12,
+                        color:
+                            Colors.white, // Cambiar el color del texto a blanco
+                      ),
+                    ),
                   ),
                 ),
-                child: Text(
-                  buttonText,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              ],
             ),
           ],
         ),

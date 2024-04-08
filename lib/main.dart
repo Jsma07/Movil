@@ -5,6 +5,7 @@ import 'package:primer_proyecto/CustomBottomNavigationBar.dart';
 import 'package:primer_proyecto/app_bar.dart';
 import 'package:primer_proyecto/detalle_insumo.dart';
 import 'package:primer_proyecto/Databasehelper.dart' as DBHelper;
+import 'package:primer_proyecto/Login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
+      home: Principal(),
     );
   }
 }
