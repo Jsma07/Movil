@@ -5,11 +5,16 @@ import 'package:primer_proyecto/CustomBottomNavigationBar.dart';
 import 'package:primer_proyecto/Login.dart';
 import 'package:primer_proyecto/app_bar.dart';
 import 'package:primer_proyecto/detalle_insumo.dart';
-import 'package:primer_proyecto/Databasehelper.dart' as DBHelper;
+import 'package:flutter/material.dart';
+import 'package:primer_proyecto/Databasehelper.dart'; // Asegúrate de importar tu clase DatabaseHelper
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de inicializar Flutter
+
+  // Inicializa la base de datos
+  await DatabaseHelper().initDatabase();
+
   runApp(const MyApp());
-  await DBHelper.DatabaseHelper().initDatabase();
 }
 
 class MyApp extends StatelessWidget {
@@ -43,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadVentas() async {
     try {
-      DBHelper.DatabaseHelper databaseHelper = DBHelper.DatabaseHelper();
+      DatabaseHelper databaseHelper = DatabaseHelper();
       ventas = await databaseHelper
           .getVentas(); // Obtener ventas desde la base de datos
       setState(() {}); // Actualizar la interfaz después de cargar las ventas
@@ -55,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<int> _getTotalVentas() async {
     try {
       // Llamar al método en DatabaseHelper que obtiene el total de ventas
-      DBHelper.DatabaseHelper databaseHelper = DBHelper.DatabaseHelper();
+      DatabaseHelper databaseHelper = DatabaseHelper();
       int totalVentas = await databaseHelper.getCountVentas();
       return totalVentas;
     } catch (e) {
@@ -362,7 +367,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final ventaId = ventas[index]['idVenta'];
 
       // Llamar al método en DatabaseHelper para eliminar la venta por su ID
-      DBHelper.DatabaseHelper databaseHelper = DBHelper.DatabaseHelper();
+      DatabaseHelper databaseHelper = DatabaseHelper();
       await databaseHelper.deleteVenta(ventaId);
 
       // Actualizar la lista de ventas después de eliminar el registro
