@@ -92,6 +92,8 @@ class _AdicionesState extends State<Adiciones> {
                     itemBuilder: (BuildContext context, int index) {
                       String imageUrl =
                           (adiciones[index]['imagenInsumo'] ?? '').trim();
+                      print('URL de la imagen: $imageUrl');
+
                       String nombreInsumo =
                           adiciones[index]['nombreInsumo'] ?? '';
 

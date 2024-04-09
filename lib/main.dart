@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:primer_proyecto/CancelarVenta.dart';
 import 'package:primer_proyecto/CrearVenta.dart';
 import 'package:primer_proyecto/CustomBottomNavigationBar.dart';
+import 'package:primer_proyecto/Login.dart';
 import 'package:primer_proyecto/app_bar.dart';
 import 'package:primer_proyecto/detalle_insumo.dart';
 import 'package:primer_proyecto/Databasehelper.dart' as DBHelper;
-import 'package:primer_proyecto/Login.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
+  await DBHelper.DatabaseHelper().initDatabase();
 }
 
 class MyApp extends StatelessWidget {
@@ -313,11 +314,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemCount: ventas.length,
                       itemBuilder: (context, index) {
                         final venta = ventas[index];
+                        final servicioId = venta['servicioId'];
                         print('Venta en el índice $index: $venta');
                         return buildSalesListItem(
                           title: venta['nombreServicio'] ?? 'Producto',
                           imageUrl: venta['imgServicio'] ?? '',
-                          subtitle: venta['precioServicio'] ?? '0',
+                          subtitle: 'Precio: \$${venta['precioServicio']}',
                           onVisibilityTap: () {
                             print('Tapped visibility for venta: $venta');
                             Navigator.push(
