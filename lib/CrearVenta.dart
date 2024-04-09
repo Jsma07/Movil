@@ -414,63 +414,69 @@ class _CrearVentaState extends State<CrearVenta> {
                           ),
                           const SizedBox(height: 25),
                           TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Fecha de la venta',
-                              hintStyle:
-                                  const TextStyle(fontWeight: FontWeight.w600),
-                              prefixIcon: const Icon(Icons.calendar_today),
-                              fillColor: Colors.grey.shade200,
-                              filled: true,
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(25),
+                              decoration: InputDecoration(
+                                hintText: 'Fecha de la venta',
+                                hintStyle: const TextStyle(
+                                    fontWeight: FontWeight.w600),
+                                prefixIcon: const Icon(Icons.calendar_today),
+                                fillColor: Colors.grey.shade200,
+                                filled: true,
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                            readOnly:
-                                true, // Para evitar que el usuario edite manualmente la fecha
-                            onTap: () async {
-                              // Acción cuando se toca el campo de fecha
-                              final pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: _fechaVenta,
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime(2100),
-                                builder: (BuildContext context, Widget? child) {
-                                  return Theme(
-                                    data: ThemeData.light().copyWith(
-                                      colorScheme: const ColorScheme.light(
-                                        background: Colors
-                                            .purple, // Color del botón de selección de fecha
+                              readOnly: true,
+                              onTap: () async {
+                                final DateTime currentDate = DateTime.now();
+                                final DateTime firstSelectableDate =
+                                    currentDate.subtract(const Duration(
+                                        days:
+                                            15)); // 15 días antes de la fecha actual
+                                final DateTime lastSelectableDate =
+                                    currentDate; // La fecha actual como fecha máxima
+
+                                final pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: _fechaVenta,
+                                  firstDate: firstSelectableDate,
+                                  lastDate: lastSelectableDate,
+                                  builder:
+                                      (BuildContext context, Widget? child) {
+                                    return Theme(
+                                      data: ThemeData.light().copyWith(
+                                        colorScheme: const ColorScheme.light(
+                                          background: Colors.purple,
+                                        ),
                                       ),
-                                    ),
-                                    child: child!,
-                                  );
-                                },
-                              );
-                              if (pickedDate != null &&
-                                  pickedDate != _fechaVenta) {
-                                setState(() {
-                                  _fechaVenta = pickedDate;
-                                });
-                              }
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor seleccione la fecha de la venta';
-                              }
-                              return null;
-                            },
-                            // Mostrar la fecha seleccionada en el campo
-                            controller: TextEditingController(
+                                      child: child!,
+                                    );
+                                  },
+                                );
+
+                                if (pickedDate != null &&
+                                    pickedDate != _fechaVenta) {
+                                  setState(() {
+                                    _fechaVenta = pickedDate;
+                                  });
+                                }
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor seleccione la fecha de la venta';
+                                }
+                                return null;
+                              },
+                              controller: TextEditingController(
                                 text:
-                                    '${_fechaVenta.day}/${_fechaVenta.month}/${_fechaVenta.year}'),
-                          ),
+                                    '${_fechaVenta.day}/${_fechaVenta.month}/${_fechaVenta.year}',
+                              )),
                           const SizedBox(height: 40),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
