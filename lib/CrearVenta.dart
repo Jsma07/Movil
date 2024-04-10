@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:primer_proyecto/Adiciones.dart';
 import 'package:primer_proyecto/main.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:primer_proyecto/Login.dart';
+
 import 'Databasehelper.dart' as DBHelper;
 
 class Venta {
@@ -536,8 +537,8 @@ class _CrearVentaState extends State<CrearVenta> {
             label: 'Carrito',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.more_horiz),
-            label: 'Más',
+            icon: Icon(Icons.exit_to_app),
+            label: 'cerrar sesion',
           ),
         ],
         onTap: (int index) {
@@ -545,11 +546,19 @@ class _CrearVentaState extends State<CrearVenta> {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MyHomePage()),
+                MaterialPageRoute(builder: (context) => MyHomePage()),
               );
               break;
             case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CrearVenta()),
+              );
+            case 2:
+              Login.destroySession(context);
+
               break;
+            // Agrega más casos según la cantidad de elementos en tu BottomNavigationBar
           }
         },
       ),

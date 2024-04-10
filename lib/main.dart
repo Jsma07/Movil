@@ -5,7 +5,6 @@ import 'package:primer_proyecto/CustomBottomNavigationBar.dart';
 import 'package:primer_proyecto/Login.dart';
 import 'package:primer_proyecto/app_bar.dart';
 import 'package:primer_proyecto/detalle_insumo.dart';
-import 'package:flutter/material.dart';
 import 'package:primer_proyecto/Databasehelper.dart'; // Asegúrate de importar tu clase DatabaseHelper
 
 void main() async {
@@ -395,6 +394,9 @@ class _MyHomePageState extends State<MyHomePage> {
           context,
           MaterialPageRoute(builder: (context) => CrearVenta()),
         );
+      case 2:
+        Login.destroySession(context);
+
         break;
       // Agrega más casos según la cantidad de elementos en tu BottomNavigationBar
     }

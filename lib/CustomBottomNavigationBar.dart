@@ -23,8 +23,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: 'Carrito',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.more_horiz),
-          label: 'Más',
+          icon: Icon(Icons.exit_to_app),
+          label: 'Cerrar Sesion',
         ),
       ],
       onTap: onTap,

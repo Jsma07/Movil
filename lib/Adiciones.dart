@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:primer_proyecto/CrearVenta.dart';
+import 'package:primer_proyecto/Login.dart';
 import 'package:primer_proyecto/main.dart';
 import 'CustomBottomNavigationBar.dart';
 import 'package:primer_proyecto/Databasehelper.dart'
@@ -19,6 +20,18 @@ class _AdicionesState extends State<Adiciones> {
   void initState() {
     super.initState();
     _loadAdiciones(); // Cargar adiciones al iniciar la pantalla
+  }
+
+  void _destroySession(BuildContext context) {
+    // Limpiar los controladores de texto
+
+    print('sesion cerrada');
+
+    // Redirigir a la página 'Principal' al cerrar sesión
+    Navigator.pushReplacement(
+      context as BuildContext,
+      MaterialPageRoute(builder: (context) => Principal()),
+    );
   }
 
   Future<void> _loadAdiciones() async {
@@ -51,6 +64,8 @@ class _AdicionesState extends State<Adiciones> {
         );
         break;
       case 2:
+        Login.destroySession(context);
+
         // Agrega el código para la tercera página si es necesario
         break;
     }

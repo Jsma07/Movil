@@ -23,10 +23,8 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
     // Iniciar la animación cuando se complete la construcción inicial del widget
     _animationController.forward().then((_) {
       // Redirigir a la página principal luego de completar la animación
-      Navigator.pushReplacement(
-        context as BuildContext,
-        MaterialPageRoute(builder: (context) => const Principal()),
-      );
+      Navigator.of(context as BuildContext).pushReplacement(
+          MaterialPageRoute(builder: (context) => const MyHomePage()));
     });
   }
 
@@ -70,11 +68,28 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
+  static void destroySession(BuildContext context) {
+    _LoginState()._destroySession(context);
+  }
 }
 
 class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  void _destroySession(BuildContext context) {
+    // Limpiar los controladores de texto
+
+    print('sesion cerrada');
+
+    emailController.clear();
+    passwordController
+        .clear(); // Redirigir a la página 'Principal' al cerrar sesión
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => Principal()),
+      (Route<dynamic> route) => false, // Eliminar todas las demás rutas
+    );
+  }
 
   Database? _database;
 
@@ -179,27 +194,6 @@ class _LoginState extends State<Login> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               const SizedBox(height: 30),
-                              ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 52, 177, 239),
-                                  disabledBackgroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 70,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  elevation: 10,
-                                ),
-                                child: const Text(
-                                  'Login',
-                                  style: TextStyle(fontSize: 26),
-                                ),
-                              ),
-                              const SizedBox(height: 30),
                               TextField(
                                 controller: emailController,
                                 decoration: InputDecoration(
@@ -246,7 +240,7 @@ class _LoginState extends State<Login> {
                                             email, password);
 
                                     if (isValid) {
-                                      Navigator.push(
+                                      Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
@@ -368,6 +362,18 @@ class _PrincipalState extends State<Principal>
     super.dispose();
   }
 
+  void _destroySession(BuildContext context) {
+    // Limpiar los controladores de texto
+
+    print('sesion cerrada');
+
+    // Redirigir a la página 'Principal' al cerrar sesión
+    Navigator.pushReplacement(
+      context as BuildContext,
+      MaterialPageRoute(builder: (context) => Principal()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -426,6 +432,8 @@ class _PrincipalState extends State<Principal>
                                 .value), // Mover el botón verticalmente
                     child: ElevatedButton(
                       onPressed: () {
+                        // Destruir la sesión al presionar el botón
+                        _destroySession(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => Login()),
