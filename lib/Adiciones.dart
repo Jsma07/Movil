@@ -30,7 +30,7 @@ class _AdicionesState extends State<Adiciones> {
     // Redirigir a la página 'Principal' al cerrar sesión
     Navigator.pushReplacement(
       context as BuildContext,
-      MaterialPageRoute(builder: (context) => Principal()),
+      MaterialPageRoute(builder: (context) => const Principal()),
     );
   }
 
@@ -60,7 +60,7 @@ class _AdicionesState extends State<Adiciones> {
       case 1:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => CrearVenta()),
+          MaterialPageRoute(builder: (context) => const CrearVenta()),
         );
         break;
       case 2:
@@ -238,7 +238,7 @@ class CustomCard extends StatelessWidget {
             300, // Altura de la Card (puedes ajustar este valor para hacerla más grande)
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(40.0),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
@@ -251,7 +251,7 @@ class CustomCard extends StatelessWidget {
           ),
         ),
 
-        padding: EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
         child: ListView(
           padding: EdgeInsets.zero,
           shrinkWrap: true,
@@ -287,32 +287,32 @@ class CustomCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 5), // Espacio entre la imagen y el texto
+                const SizedBox(height: 5), // Espacio entre la imagen y el texto
                 Text(
                   title, // Título de la tarjeta
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   subtitle, // Subtítulo de la tarjeta
-                  style: TextStyle(fontSize: 14),
+                  style: const TextStyle(fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 10), // Espacio entre el precio y el botón
+                const SizedBox(height: 10), // Espacio entre el precio y el botón
                 SizedBox(
                   width: double
                       .infinity, // Ajustar el ancho del contenedor al ancho de la tarjeta
                   child: ElevatedButton(
                     onPressed: onPressed, // Función al presionar el botón
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.blue,
-                      padding: EdgeInsets.symmetric(
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 20), // Ajustar el padding del botón
                     ),
                     child: Text(
                       buttonText, // Texto del botón
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         color:
                             Colors.white, // Cambiar el color del texto a blanco

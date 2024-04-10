@@ -86,7 +86,7 @@ class _LoginState extends State<Login> {
         .clear(); // Redirigir a la página 'Principal' al cerrar sesión
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => Principal()),
+      MaterialPageRoute(builder: (context) => const Principal()),
       (Route<dynamic> route) => false, // Eliminar todas las demás rutas
     );
   }
@@ -196,7 +196,7 @@ class _LoginState extends State<Login> {
                               const SizedBox(height: 30),
                               TextField(
                                 controller: emailController,
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   labelText: 'Correo Electrónico',
                                   prefixIcon: Icon(Icons.email),
                                   border: UnderlineInputBorder(
@@ -213,7 +213,7 @@ class _LoginState extends State<Login> {
                               TextField(
                                 controller: passwordController,
                                 obscureText: true,
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   labelText: 'Contraseña',
                                   prefixIcon: Icon(Icons.lock),
                                   border: UnderlineInputBorder(
@@ -251,15 +251,15 @@ class _LoginState extends State<Login> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
-                                            title: Text('Error'),
-                                            content: Text(
+                                            title: const Text('Error'),
+                                            content: const Text(
                                                 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'),
                                             actions: <Widget>[
                                               TextButton(
                                                 onPressed: () {
                                                   Navigator.of(context).pop();
                                                 },
-                                                child: Text('Cerrar'),
+                                                child: const Text('Cerrar'),
                                               ),
                                             ],
                                           );
@@ -271,15 +271,15 @@ class _LoginState extends State<Login> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: Text('Error'),
-                                          content: Text(
+                                          title: const Text('Error'),
+                                          content: const Text(
                                               'Por favor, completa todos los campos.'),
                                           actions: <Widget>[
                                             TextButton(
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                               },
-                                              child: Text('Cerrar'),
+                                              child: const Text('Cerrar'),
                                             ),
                                           ],
                                         );
@@ -306,7 +306,7 @@ class _LoginState extends State<Login> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              Row(
+                              const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
@@ -370,7 +370,7 @@ class _PrincipalState extends State<Principal>
     // Redirigir a la página 'Principal' al cerrar sesión
     Navigator.pushReplacement(
       context as BuildContext,
-      MaterialPageRoute(builder: (context) => Principal()),
+      MaterialPageRoute(builder: (context) => const Principal()),
     );
   }
 

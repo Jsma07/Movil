@@ -71,11 +71,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(), // Quité el const ya que CustomAppBar no es const
+      appBar: const CustomAppBar(), // Quité el const ya que CustomAppBar no es const
       body: Padding(
         padding: const EdgeInsets.only(top: 25),
         child: ventas.isEmpty
-            ? Center(child: CircularProgressIndicator()) // Indicador de carga
+            ? const Center(child: CircularProgressIndicator()) // Indicador de carga
             : Column(
                 children: [
                   SizedBox(
@@ -96,34 +96,34 @@ class _MyHomePageState extends State<MyHomePage> {
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
-                                          return CircularProgressIndicator(); // Muestra un indicador de carga mientras se obtiene el total de ventas
+                                          return const CircularProgressIndicator(); // Muestra un indicador de carga mientras se obtiene el total de ventas
                                         } else {
                                           if (snapshot.hasError) {
-                                            return Text(
+                                            return const Text(
                                                 'Error al cargar las ventas'); // Maneja errores si falla la obtención de datos
                                           } else {
                                             final totalVentas =
                                                 snapshot.data ?? 0;
                                             return Column(
                                               children: [
-                                                Text(
+                                                const Text(
                                                   'Ventas realizadas',
                                                   style: TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
-                                                SizedBox(height: 4),
+                                                const SizedBox(height: 4),
                                                 Row(
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.attach_money,
                                                       color: Colors.black,
                                                     ),
-                                                    SizedBox(width: 8),
+                                                    const SizedBox(width: 8),
                                                     Text(
                                                       '${totalVentas}',
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                           fontSize: 20),
                                                     ),
                                                   ],
@@ -135,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       },
                                     ),
                                   ),
-                                  SizedBox(height: 8),
+                                  const SizedBox(height: 8),
                                   Row(
                                     children: [
                                       Expanded(
@@ -144,36 +144,36 @@ class _MyHomePageState extends State<MyHomePage> {
                                             // Acción del botón verde
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Color.fromARGB(
+                                            backgroundColor: const Color.fromARGB(
                                                 255, 147, 206, 189),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(20),
                                             ),
-                                            minimumSize: Size(40, 40),
+                                            minimumSize: const Size(40, 40),
                                           ),
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.visibility_off,
                                             color: Colors.black,
                                           ),
                                         ),
                                       ),
-                                      SizedBox(width: 8),
+                                      const SizedBox(width: 8),
                                       Expanded(
                                         child: ElevatedButton(
                                           onPressed: () {
                                             // Acción del botón amarillo
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Color.fromARGB(
+                                            backgroundColor: const Color.fromARGB(
                                                 255, 245, 54, 54),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(20),
                                             ),
-                                            minimumSize: Size(40, 40),
+                                            minimumSize: const Size(40, 40),
                                           ),
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.search,
                                             color: Colors.black,
                                           ),
@@ -186,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: SizedBox(
                             height: 138,
@@ -196,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Center(
+                                    const Center(
                                       child: Text(
                                         'Tecnica mas vendida',
                                         style: TextStyle(
@@ -205,8 +205,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(height: 4),
-                                    Row(
+                                    const SizedBox(height: 4),
+                                    const Row(
                                       children: [
                                         CircleAvatar(
                                           radius: 15,
@@ -220,43 +220,43 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 8),
+                                    const SizedBox(height: 8),
                                     Row(
                                       children: [
                                         Expanded(
                                           child: ElevatedButton(
                                             onPressed: () {},
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Color.fromARGB(
+                                              backgroundColor: const Color.fromARGB(
                                                   255, 147, 206, 189),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(20),
                                               ),
-                                              minimumSize: Size(40, 40),
+                                              minimumSize: const Size(40, 40),
                                             ),
-                                            child: Icon(
+                                            child: const Icon(
                                               Icons.visibility_off,
                                               color: Colors.black,
                                             ),
                                           ),
                                         ),
-                                        SizedBox(width: 8),
+                                        const SizedBox(width: 8),
                                         Expanded(
                                           child: ElevatedButton(
                                             onPressed: () {
                                               // Acción del botón amarillo
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Color.fromARGB(
+                                              backgroundColor: const Color.fromARGB(
                                                   255, 245, 54, 54),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(20),
                                               ),
-                                              minimumSize: Size(40, 40),
+                                              minimumSize: const Size(40, 40),
                                             ),
-                                            child: Icon(
+                                            child: const Icon(
                                               Icons.search,
                                               color: Colors.black,
                                             ),
@@ -273,10 +273,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ListTile(
-                    leading: Icon(Icons.shopping_cart),
-                    title: Text(
+                    leading: const Icon(Icons.shopping_cart),
+                    title: const Text(
                       'Lista de ventas',
                       style: TextStyle(
                         fontSize: 20,
@@ -290,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Color.fromRGBO(112, 185, 244, 1),
+                            color: const Color.fromRGBO(112, 185, 244, 1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: SizedBox(
@@ -301,10 +301,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => CrearVenta()),
+                                      builder: (context) => const CrearVenta()),
                                 );
                               },
-                              icon: Icon(Icons.add),
+                              icon: const Icon(Icons.add),
                               color: Colors.white,
                             ),
                           ),
@@ -312,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Expanded(
                     child: ListView.builder(
                       itemCount: ventas.length,
@@ -387,13 +387,13 @@ class _MyHomePageState extends State<MyHomePage> {
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => MyHomePage()),
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
         );
         break;
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CrearVenta()),
+          MaterialPageRoute(builder: (context) => const CrearVenta()),
         );
       case 2:
         Login.destroySession(context);
@@ -429,27 +429,27 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Container(
                 width: 35,
                 height: 35,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color.fromRGBO(112, 185, 244, 1),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.visibility,
                   color: Colors.white,
                 ),
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             GestureDetector(
               onTap: onCancelTap,
               child: Container(
                 width: 35,
                 height: 35,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color.fromRGBO(112, 185, 244, 1),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.cancel,
                   color: Colors.white,
                 ),

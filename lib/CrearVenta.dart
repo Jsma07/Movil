@@ -116,7 +116,7 @@ class _CrearVentaState extends State<CrearVenta> {
         await _databaseHelper.insertVenta(nuevaVenta.toMap());
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Venta registrada correctamente'),
           ),
         );
@@ -132,7 +132,7 @@ class _CrearVentaState extends State<CrearVenta> {
       } catch (e) {
         print('Error al guardar la venta: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Error al guardar la venta'),
           ),
         );
@@ -552,13 +552,13 @@ class _CrearVentaState extends State<CrearVenta> {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyHomePage()),
+                MaterialPageRoute(builder: (context) => const MyHomePage()),
               );
               break;
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CrearVenta()),
+                MaterialPageRoute(builder: (context) => const CrearVenta()),
               );
             case 2:
               Login.destroySession(context);

@@ -40,7 +40,7 @@ class _DetalleInsumoState extends State<DetalleInsumo> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  CrearVenta()), // Reemplaza CrearVenta con la página de destino correcta
+                  const CrearVenta()), // Reemplaza CrearVenta con la página de destino correcta
         );
         break;
       case 2:
@@ -118,7 +118,7 @@ class _DetalleInsumoState extends State<DetalleInsumo> {
                               _isLoading = true;
                             });
 
-                            Future.delayed(Duration(seconds: 1), () {
+                            Future.delayed(const Duration(seconds: 1), () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -150,7 +150,7 @@ class _DetalleInsumoState extends State<DetalleInsumo> {
             ),
           ),
           if (_isLoading)
-            Center(
+            const Center(
               child: CircularProgressIndicator(),
             ),
         ],
