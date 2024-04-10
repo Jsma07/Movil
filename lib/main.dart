@@ -322,7 +322,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         print('Venta en el índice $index: $venta');
                         return buildSalesListItem(
                           title: venta['nombreServicio'] ?? 'Producto',
-                          imageUrl: venta['imgServicio'] ?? '',
+                          imageWidget:
+                              Image.network(venta['imageUrl'] ?? Icons.error),
                           subtitle: 'Precio: \$${venta['precioServicio']}',
                           onVisibilityTap: () {
                             print('Tapped visibility for venta: $venta');
@@ -404,7 +405,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget buildSalesListItem({
     required String title,
-    required String imageUrl,
+    required Widget imageWidget,
     required String subtitle,
     required Function() onVisibilityTap,
     required Function() onCancelTap,
@@ -414,20 +415,8 @@ class _MyHomePageState extends State<MyHomePage> {
         leading: Container(
           width: 50,
           height: 50,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3),
-              ),
-            ],
-          ),
-          child: CircleAvatar(
-            radius: 25,
-            backgroundImage: NetworkImage(imageUrl),
+          child: ClipOval(
+            child: imageWidget, // Envolver la imagen en ClipOval
           ),
         ),
         title: Text(title),

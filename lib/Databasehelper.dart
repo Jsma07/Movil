@@ -215,7 +215,8 @@ class DatabaseHelper {
       'nombreServicio': 'Uñas acrilicas',
       'precioServicio': 70000.0,
       'tiempoServicio': '4 horas',
-      'imgServicio': '',
+      'imgServicio':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo8hUlWcwbXkr83oNIgRryvgjhrfAKHpeKBg&s',
       'estadoServicio': 1,
     });
     await db.insert('Servicio', {
@@ -223,7 +224,8 @@ class DatabaseHelper {
       'nombreServicio': 'Uñas 3D',
       'precioServicio': 100000.0,
       'tiempoServicio': '3 horas',
-      'imgServicio': '',
+      'imgServicio':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo8hUlWcwbXkr83oNIgRryvgjhrfAKHpeKBg&s',
       'estadoServicio': 1,
     });
     await db.insert('Servicio', {
@@ -231,7 +233,8 @@ class DatabaseHelper {
       'nombreServicio': 'Uñas press on',
       'precioServicio': 50000.0,
       'tiempoServicio': '5 horas',
-      'imgServicio': '',
+      'imgServicio':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo8hUlWcwbXkr83oNIgRryvgjhrfAKHpeKBg&s',
       'estadoServicio': 1,
     });
     await db.insert('Servicio', {
@@ -239,7 +242,8 @@ class DatabaseHelper {
       'nombreServicio': 'Uñas permanentes',
       'precioServicio': 70000.0,
       'tiempoServicio': '4 horas',
-      'imgServicio': '',
+      'imgServicio':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo8hUlWcwbXkr83oNIgRryvgjhrfAKHpeKBg&s',
       'estadoServicio': 1,
     });
     await db.insert('Servicio', {
@@ -247,7 +251,8 @@ class DatabaseHelper {
       'nombreServicio': 'Uñas Semipermanentes',
       'precioServicio': 60000.0,
       'tiempoServicio': '3 horas',
-      'imgServicio': '',
+      'imgServicio':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo8hUlWcwbXkr83oNIgRryvgjhrfAKHpeKBg&s',
       'estadoServicio': 1,
     });
 
