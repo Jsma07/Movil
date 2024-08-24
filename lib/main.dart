@@ -5,7 +5,7 @@ import 'package:primer_proyecto/CustomBottomNavigationBar.dart';
 import 'package:primer_proyecto/Login.dart';
 import 'package:primer_proyecto/app_bar.dart';
 import 'package:primer_proyecto/detalle_insumo.dart';
-import 'package:primer_proyecto/Databasehelper.dart'; // Asegúrate de importar tu clase DatabaseHelper
+import 'package:primer_proyecto/Databasehelper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de inicializar Flutter

@@ -61,11 +61,10 @@ class DatabaseHelper {
   // Obtener adiciones desde la API
   Future<List<Map<String, dynamic>>> getAdiciones() async {
     try {
-      final response = await http.get(Uri.parse(
-          '$baseUrl/Jackenail/Listarventas/adiciones')); // Cambia 'adiciones' por tu endpoint real
+      final response = await http
+          .get(Uri.parse('$baseUrl/Jackenail/Listarventas/adiciones'));
 
       if (response.statusCode == 200) {
-        // Decodificar el cuerpo de la respuesta como JSON
         List<dynamic> jsonResponse = json.decode(response.body);
         // Convertir la lista de mapas dinámicos en una lista de mapas con tipo específico
         return jsonResponse
@@ -95,18 +94,15 @@ class DatabaseHelper {
       final response = await http.get(Uri.parse('$baseUrl/api/totalventas'));
 
       if (response.statusCode == 200) {
-        // Decodifica el cuerpo de la respuesta como un mapa
         final Map<String, dynamic> data = json.decode(response.body);
-        // Obtén el valor de 'totalVentas' y conviértelo a entero
+        // Obtén el valor de totalVentas y conviértelo a entero
         final int count = data['totalVentas'] as int;
         return count;
       } else {
-        // Lanza una excepción si el estado de la respuesta no es 200 OK
         throw Exception(
             'Error al cargar las ventas: Estado ${response.statusCode}');
       }
     } catch (e) {
-      // Lanza una excepción si ocurre un error durante la conversión o la solicitud
       throw Exception('Error al procesar la respuesta de las ventas: $e');
     }
   }
