@@ -11,7 +11,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de inicializar Flutter
 
   // Inicializa la base de datos
-  await DatabaseHelper().initDatabase();
+  // await DatabaseHelper().initDatabase();
 
   runApp(const MyApp());
 }
@@ -48,8 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _loadVentas() async {
     try {
       DatabaseHelper databaseHelper = DatabaseHelper();
-      ventas = await databaseHelper
-          .getVentas(); // Obtener ventas desde la base de datos
+      ventas = await databaseHelper.getVentas(); // Obtener ventas desde la API
       setState(() {}); // Actualizar la interfaz después de cargar las ventas
     } catch (e) {
       print('Error al cargar las ventas: $e');
@@ -64,18 +63,18 @@ class _MyHomePageState extends State<MyHomePage> {
       return totalVentas;
     } catch (e) {
       print('Error al obtener el total de ventas: $e');
-      return 0; // Devolver 0 en caso de error
+      return 0;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(), // Quité el const ya que CustomAppBar no es const
+      appBar: const CustomAppBar(),
       body: Padding(
         padding: const EdgeInsets.only(top: 25),
         child: ventas.isEmpty
-            ? const Center(child: CircularProgressIndicator()) // Indicador de carga
+            ? const Center(child: CircularProgressIndicator())
             : Column(
                 children: [
                   SizedBox(
@@ -144,8 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                             // Acción del botón verde
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color.fromARGB(
-                                                255, 147, 206, 189),
+                                            backgroundColor:
+                                                const Color.fromARGB(
+                                                    255, 147, 206, 189),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(20),
@@ -165,8 +165,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                             // Acción del botón amarillo
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color.fromARGB(
-                                                255, 245, 54, 54),
+                                            backgroundColor:
+                                                const Color.fromARGB(
+                                                    255, 245, 54, 54),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(20),
@@ -227,8 +228,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                           child: ElevatedButton(
                                             onPressed: () {},
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color.fromARGB(
-                                                  255, 147, 206, 189),
+                                              backgroundColor:
+                                                  const Color.fromARGB(
+                                                      255, 147, 206, 189),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(20),
@@ -248,8 +250,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                               // Acción del botón amarillo
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color.fromARGB(
-                                                  255, 245, 54, 54),
+                                              backgroundColor:
+                                                  const Color.fromARGB(
+                                                      255, 245, 54, 54),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(20),
@@ -298,11 +301,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             height: 40,
                             child: IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const CrearVenta()),
-                                );
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //       builder: (context) => const CrearVenta()),
+                                // );
                               },
                               icon: const Icon(Icons.add),
                               color: Colors.white,
@@ -318,22 +321,40 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemCount: ventas.length,
                       itemBuilder: (context, index) {
                         final venta = ventas[index];
-                        final servicioId = venta['servicioId'];
-                        print('Venta en el índice $index: $venta');
+                        final nombreServicio =
+                            venta['servicio']['Nombre_Servicio'] ?? 'Producto';
+                        final imageUrl = venta['servicio']['ImgServicio'] ?? '';
+                        final precioServicio =
+                            venta['servicio']['Precio_Servicio'] ?? '0.00';
+
+                        // Construye la URL completa de la imagen
+                        final validImageUrl = imageUrl.isNotEmpty
+                            ? 'http://localhost:5000$imageUrl'
+                            : 'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg';
+
                         return buildSalesListItem(
-                          title: venta['nombreServicio'] ?? 'Producto',
-                          imageWidget:
-                              Image.network(venta['imageUrl'] ?? Icons.error),
-                          subtitle: 'Precio: \$${venta['precioServicio']}',
+                          title: nombreServicio,
+                          imageWidget: Image.network(
+                            validImageUrl,
+                            errorBuilder: (context, error, stackTrace) {
+                              print(
+                                  'Error cargando la imagen: $error'); // Para depuración
+                              return Image.network(
+                                'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg',
+                                fit: BoxFit.cover,
+                              );
+                            },
+                            fit: BoxFit.cover,
+                          ),
+                          subtitle: 'Precio: \$${precioServicio}',
                           onVisibilityTap: () {
                             print('Tapped visibility for venta: $venta');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const DetalleInsumo(
-                                  imageUrl:
-                                      'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg',
-                                  productName: 'Uñas acrílicas',
+                                builder: (context) => DetalleInsumo(
+                                  imageUrl: validImageUrl,
+                                  productName: nombreServicio,
                                 ),
                               ),
                             );
@@ -391,10 +412,10 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CrearVenta()),
-        );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const CrearVenta()),
+      // );
       case 2:
         Login.destroySession(context);
 

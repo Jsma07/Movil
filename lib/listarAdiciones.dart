@@ -17,7 +17,7 @@ class SaleItem {
     required this.imageUrl,
     this.quantity = 1,
   });
-} 
+}
 
 class ListarAdiciones extends StatefulWidget {
   final List<Map<String, dynamic>> adiciones;
@@ -28,13 +28,10 @@ class ListarAdiciones extends StatefulWidget {
   _ListarAdicionesState createState() => _ListarAdicionesState();
 }
 
-
 class _ListarAdicionesState extends State<ListarAdiciones> {
-    int _currentIndex = 0;
+  int _currentIndex = 0;
 
   late List<SaleItem> saleItems;
-
-  
 
   @override
   void initState() {
@@ -43,17 +40,19 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
       SaleItem(
         title: 'Figuras 3D',
         price: '\$4.000',
-        imageUrl: 'https://i.pinimg.com/736x/a3/29/93/a3299364b40279d7d5769edecfe11352.jpg',
+        imageUrl:
+            'https://i.pinimg.com/736x/a3/29/93/a3299364b40279d7d5769edecfe11352.jpg',
       ),
       SaleItem(
         title: 'Priedrerias',
         price: '\$1.000',
-        imageUrl: 'https://th.bing.com/th/id/OIP.rmp4wAbXA3tDJTo6IKV0xwAAAA?w=465&h=537&rs=1&pid=ImgDetMain',
+        imageUrl:
+            'https://th.bing.com/th/id/OIP.rmp4wAbXA3tDJTo6IKV0xwAAAA?w=465&h=537&rs=1&pid=ImgDetMain',
       ),
     ];
   }
 
-   void _onTabTapped(int index) {
+  void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
     });
@@ -65,10 +64,10 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
         );
         break;
       case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const CrearVenta()),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const CrearVenta()),
+        // );
         break;
       case 2:
         // Agrega el código para la tercera página si es necesario
@@ -116,7 +115,7 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
                     CircleAvatar(
                       radius: 23,
                       backgroundImage: NetworkImage(
-                        'https://i.pinimg.com/564x/85/53/5e/85535e2d471e0f036ae4492327581c3e.jpg'),
+                          'https://i.pinimg.com/564x/85/53/5e/85535e2d471e0f036ae4492327581c3e.jpg'),
                     ),
                     Text(
                       'Jacke Nail',
@@ -129,7 +128,7 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
                     CircleAvatar(
                       radius: 23,
                       backgroundImage: NetworkImage(
-                        'https://i.pinimg.com/236x/1e/56/aa/1e56aa733e30dc0fd59a72182c8a7df9.jpg'),
+                          'https://i.pinimg.com/236x/1e/56/aa/1e56aa733e30dc0fd59a72182c8a7df9.jpg'),
                     ),
                   ],
                 ),
@@ -145,7 +144,7 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: NetworkImage(
-                  'https://i.pinimg.com/736x/48/4c/32/484c3283a34c9db7df7ead32d138bf3f.jpg'),
+                    'https://i.pinimg.com/736x/48/4c/32/484c3283a34c9db7df7ead32d138bf3f.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -182,11 +181,10 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
                               // Acción del primer botón
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 244, 245, 246),
+                              backgroundColor:
+                                  const Color.fromARGB(255, 244, 245, 246),
                             ),
-                            child: const Text(
-                              'Info venta'
-                            ),
+                            child: const Text('Info venta'),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -203,9 +201,12 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,
                             ),
-                            child: const Text('Adiciones', style: TextStyle(
+                            child: const Text(
+                              'Adiciones',
+                              style: TextStyle(
                                 color: Color.fromARGB(255, 244, 245, 246),
-                              ),),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -215,7 +216,8 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
               ),
               const SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -237,11 +239,11 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
                       ),
                       child: IconButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const CrearVenta()),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) => const CrearVenta()),
+                          // );
                         },
                         icon: const Icon(Icons.add),
                         color: Colors.white,
@@ -250,7 +252,8 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
                   ],
                 ),
               ),
-              const SizedBox(height: 2), // Espacio entre el botón y las tarjetas
+              const SizedBox(
+                  height: 2), // Espacio entre el botón y las tarjetas
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -267,7 +270,7 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
           ),
         ],
       ),
-       bottomNavigationBar: CustomBottomNavigationBar(
+      bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
       ),
@@ -275,11 +278,11 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
   }
 
   Widget buildSalesListItem(SaleItem saleItem) {
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 10),
-       shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(25), // Ajusta el radio de borde aquí
+      shape: RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.circular(25), // Ajusta el radio de borde aquí
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -314,7 +317,8 @@ class _ListarAdicionesState extends State<ListarAdiciones> {
             ),
             Text(
               saleItem.price,
-              style: const TextStyle(color: Colors.blue), // Color azul para el precio
+              style: const TextStyle(
+                  color: Colors.blue), // Color azul para el precio
             ),
           ],
         ),

@@ -36,12 +36,12 @@ class _DetalleInsumoState extends State<DetalleInsumo> {
         );
         break;
       case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  const CrearVenta()), // Reemplaza CrearVenta con la página de destino correcta
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) =>
+        //           const CrearVenta()), // Reemplaza CrearVenta con la página de destino correcta
+        // );
         break;
       case 2:
         // Agrega el código para la tercera página si es necesario

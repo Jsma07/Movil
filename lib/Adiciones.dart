@@ -58,10 +58,10 @@ class _AdicionesState extends State<Adiciones> {
         );
         break;
       case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const CrearVenta()),
-        );
+        // Navigator.pushReplacement(
+        //   // context,
+        //   // MaterialPageRoute(builder: (context) => const CrearVenta()),
+        // );
         break;
       case 2:
         Login.destroySession(context);
@@ -290,7 +290,8 @@ class CustomCard extends StatelessWidget {
                 const SizedBox(height: 5), // Espacio entre la imagen y el texto
                 Text(
                   title, // Título de la tarjeta
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 Text(
@@ -298,7 +299,8 @@ class CustomCard extends StatelessWidget {
                   style: const TextStyle(fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 10), // Espacio entre el precio y el botón
+                const SizedBox(
+                    height: 10), // Espacio entre el precio y el botón
                 SizedBox(
                   width: double
                       .infinity, // Ajustar el ancho del contenedor al ancho de la tarjeta

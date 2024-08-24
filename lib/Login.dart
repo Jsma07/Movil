@@ -1,73 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:primer_proyecto/main.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-
-class AnimatedSplashScreen extends StatefulWidget {
-  @override
-  _AnimatedSplashScreenState createState() => _AnimatedSplashScreenState();
-}
-
-class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    );
-
-    // Iniciar la animación cuando se complete la construcción inicial del widget
-    _animationController.forward().then((_) {
-      // Redirigir a la página principal luego de completar la animación
-      Navigator.of(context as BuildContext).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MyHomePage()));
-    });
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ScaleTransition(
-          scale: _animationController.drive(
-            CurveTween(curve: Curves.easeInOut),
-          ),
-          child: Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.grey, // Color del borde
-                width: 2, // Grosor del borde
-              ),
-            ),
-            child: ClipOval(
-              child: Image.network(
-                'https://i.pinimg.com/736x/f7/ce/e0/f7cee01bc6f7ebb3b40db04ed2d33904.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+import 'package:primer_proyecto/main.dart'; // Asegúrate de que esta ruta sea correcta
+import 'package:primer_proyecto/Databasehelper.dart'; // Ruta correcta a tu archivo Databasehelper.dart
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
+
   static void destroySession(BuildContext context) {
     _LoginState()._destroySession(context);
   }
@@ -76,60 +16,84 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final DatabaseHelper _databaseHelper = DatabaseHelper();
+
   void _destroySession(BuildContext context) {
     // Limpiar los controladores de texto
-
-    print('sesion cerrada');
-
+    print('Sesión cerrada');
     emailController.clear();
-    passwordController
-        .clear(); // Redirigir a la página 'Principal' al cerrar sesión
+    passwordController.clear();
+
+    // Redirigir a la página 'Principal' al cerrar sesión
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const Principal()),
+      MaterialPageRoute(
+          builder: (context) =>
+              const Principal()), // Asegúrate de que 'Principal' sea la clase correcta
       (Route<dynamic> route) => false, // Eliminar todas las demás rutas
     );
   }
 
-  Database? _database;
-
-  @override
-  void initState() {
-    super.initState();
-    _initDatabase();
-  }
-
-  Future<void> _initDatabase() async {
-    _database = await openDatabase(
-      join(await getDatabasesPath(), 'salon_manicura.db'),
-      version: 1,
-    );
-  }
-
-  Future<bool> _validateCredentials(String email, String password) async {
-    try {
-      if (_database == null) return false;
-
-      final List<Map<String, dynamic>> results = await _database!.query(
-        'Administrador',
-        where: 'correo = ? AND contrasena = ?',
-        whereArgs: [email, password],
-      );
-
-      print('Resultados de la consulta: $results');
-
-      return results.isNotEmpty;
-    } catch (e) {
-      print('Error al ejecutar la consulta: $e');
-      return false;
-    }
-  }
-
   bool validateInputs() {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      return false; // Uno o ambos campos están vacíos
+    return emailController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty;
+  }
+
+  Future<void> _login() async {
+    if (validateInputs()) {
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
+
+      final String? token = await _databaseHelper.login(email, password);
+
+      if (token != null) {
+        print('Token recibido, redirigiendo a MyHomePage.');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  const MyHomePage()), // Redirige a MyHomePage
+        );
+      } else {
+        print('Credenciales incorrectas.');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Credenciales incorrectas.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cerrar'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } else {
+      print('Campos vacíos.');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Por favor, completa todos los campos.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cerrar'),
+              ),
+            ],
+          );
+        },
+      );
     }
-    return true; // Ambos campos tienen datos
   }
 
   @override
@@ -229,63 +193,7 @@ class _LoginState extends State<Login> {
                               const SizedBox(height: 50),
                               ElevatedButton(
                                 onPressed: () async {
-                                  if (validateInputs()) {
-                                    final String email =
-                                        emailController.text.trim();
-                                    final String password =
-                                        passwordController.text.trim();
-
-                                    final bool isValid =
-                                        await _validateCredentials(
-                                            email, password);
-
-                                    if (isValid) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MyHomePage()),
-                                      );
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('Error'),
-                                            content: const Text(
-                                                'Credenciales incorrectas. Por favor, inténtalo de nuevo.'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('Cerrar'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
-                                  } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Error'),
-                                          content: const Text(
-                                              'Por favor, completa todos los campos.'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text('Cerrar'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
+                                  await _login(); // Llamar al método _login
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
