@@ -106,6 +106,26 @@ class DatabaseHelper {
       throw Exception('Error al procesar la respuesta de las ventas: $e');
     }
   }
+
+  // Método para obtener el detalle de una venta por su ID
+  Future<Map<String, dynamic>?> getDetalleVenta(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/Buscardetalle/$id'),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> detalleVenta = json.decode(response.body);
+        return detalleVenta;
+      } else {
+        print('Error al obtener el detalle de la venta: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
 }
 
   // Future<void> _createTables(Database db) async {

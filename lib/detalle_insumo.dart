@@ -4,12 +4,15 @@ import 'package:primer_proyecto/main.dart';
 import 'fondo_pantalla.dart'; // Asegúrate de tener este import correcto
 import 'cards_detalles.dart';
 import 'CustomBottomNavigationBar.dart'; // Asegúrate de tener este import correcto
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DetalleInsumo extends StatefulWidget {
   final String imageUrl;
   final String productName;
 
   const DetalleInsumo({
+    super.key,
     required this.imageUrl,
     required this.productName,
   });
@@ -21,6 +24,37 @@ class DetalleInsumo extends StatefulWidget {
 class _DetalleInsumoState extends State<DetalleInsumo> {
   bool _isLoading = false;
   int _currentIndex = 0;
+  Map<String, dynamic>? _detalleVenta;
+
+  final String baseUrl =
+      'http://192.168.100.44:5000'; // Asegúrate de que la URL sea correcta
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDetalleVenta(28); // Reemplaza 28 con el ID correcto si es necesario
+  }
+
+  Future<void> _fetchDetalleVenta(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/Buscardetalle/$id'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        if (data.isNotEmpty) {
+          setState(() {
+            _detalleVenta = data[0];
+          });
+        }
+      } else {
+        print('Error al obtener el detalle de la venta: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
 
   void _onTabTapped(int index) {
     setState(() {
@@ -71,28 +105,54 @@ class _DetalleInsumoState extends State<DetalleInsumo> {
                 'https://i.pinimg.com/736x/71/7d/ce/717dce3d21e998822a3ca37065b932d3.jpg',
           ),
           Positioned(
-            top: 20, // Ajusta esta posición según tu preferencia
+            top: 30, // Baja la posición
             left: 0,
             right: 0,
             child: Column(
               children: [
                 CircleAvatar(
-                  radius: 100,
+                  radius: 60, // Reducir el tamaño de la imagen
                   backgroundImage: NetworkImage(widget.imageUrl),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10), // Ajusta el espacio
                 Text(
                   widget.productName,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize:
+                        20, // Aumenta el tamaño de la fuente si es necesario
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 20), // Espacio para nuevo contenido
+                if (_detalleVenta != null) ...[
+                  // Mostrar detalles de la venta
+                  Text(
+                    'Cliente: ${_detalleVenta!['venta']['cliente']['Nombre']} ${_detalleVenta!['venta']['cliente']['Apellido']}',
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Text(
+                    'Empleado: ${_detalleVenta!['venta']['empleado']['Nombre']} ${_detalleVenta!['venta']['empleado']['Apellido']}',
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Text(
+                    'Subtotal: ${_detalleVenta!['venta']['Subtotal']}',
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Text(
+                    'Total: ${_detalleVenta!['venta']['Total']}',
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ] else ...[
+                  const Text(
+                    'Cargando detalles...',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ],
               ],
             ),
           ),
           Positioned(
-            bottom: 150,
+            top: 350,
             left: 0,
             right: 0,
             child: SizedBox(

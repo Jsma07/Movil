@@ -6,6 +6,7 @@ import 'package:primer_proyecto/Login.dart';
 import 'package:primer_proyecto/app_bar.dart';
 import 'package:primer_proyecto/detalle_insumo.dart';
 import 'package:primer_proyecto/Databasehelper.dart';
+import 'package:intl/intl.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de inicializar Flutter
@@ -65,6 +66,16 @@ class _MyHomePageState extends State<MyHomePage> {
       print('Error al obtener el total de ventas: $e');
       return 0;
     }
+  }
+
+  String formatToCOP(num amount) {
+    final format = NumberFormat.currency(
+      locale: 'es_CO',
+      symbol: '\$',
+      decimalDigits: 0,
+      customPattern: '\u00A4#,##0',
+    );
+    return format.format(amount.toDouble());
   }
 
   @override
@@ -346,7 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                             fit: BoxFit.cover,
                           ),
-                          subtitle: 'Precio: \$${precioServicio}',
+                          subtitle: 'Precio: ${formatToCOP(precioServicio)}',
                           onVisibilityTap: () {
                             print('Tapped visibility for venta: $venta');
                             Navigator.push(
