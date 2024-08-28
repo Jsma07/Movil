@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class DatabaseHelper {
-  //IP local de mi máquina y el puerto en el que corre tu servidor
   final String baseUrl = 'http://192.168.100.44:5000';
 
   Future<String?> login(String email, String password) async {
