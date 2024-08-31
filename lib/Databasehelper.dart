@@ -1,38 +1,44 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class DatabaseHelper {
-  final String baseUrl = 'http://192.168.100.44:5000';
+  final String baseUrl = 'http://192.168.137.1:5000';
 
-  Future<String?> login(String email, String password) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/iniciarSesion'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'correo': email, 'contrasena': password}),
-      );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final token = responseData['token'];
+Future<String?> login(String email, String password) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/iniciarSesion'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'correo': email, 'contrasena': password}),
+    );
 
-        if (responseData['user'] != null &&
-            responseData['user']['id'] != null) {
-          print('Token recibido: $token');
-          return token; // Devuelve el token si el inicio de sesión es exitoso
-        } else {
-          print('Usuario no encontrado en la tabla usuarios');
-          return null;
-        }
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      final token = responseData['token'];
+
+      if (responseData['user'] != null && responseData['user']['id'] != null) {
+        // Guardar el token en SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('authToken', token);
+        print('Token guardado: $token');
+
+        return token;
       } else {
-        print('Error al iniciar sesión: ${response.body}');
+        print('Usuario no encontrado en la tabla usuarios');
         return null;
       }
-    } catch (e) {
-      print('Error: $e');
-      return null; // Devuelve null en caso de excepción
+    } else {
+      print('Error al iniciar sesión: ${response.body}');
+      return null;
     }
+  } catch (e) {
+    print('Error: $e');
+    return null; 
   }
+}
 
   Future<List<Map<String, dynamic>>> getVentas() async {
     final response =
@@ -46,16 +52,59 @@ class DatabaseHelper {
     }
   }
 
-  Future<List<dynamic>> insertVenta() async {
+  Future<List<Map<String, dynamic>>> getClientes() async {
     final response =
-        await http.get(Uri.parse('$baseUrl/Jackenail/RegistrarVenta'));
+        await http.get(Uri.parse('$baseUrl/jackenail/Listar_Clientes'));
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => item as Map<String, dynamic>).toList();
     } else {
-      throw Exception('Error al cargar las ventas');
+      throw Exception('Error al cargar los clientes');
     }
   }
+
+  Future<List<Map<String, dynamic>>> getEmpleados() async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/jackenail/Listar_Empleados'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => item as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Error al cargar los empleados');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getServicios() async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/api/servicios'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => item as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Error al cargar los servicios');
+    }
+  }
+
+Future<Map<String, dynamic>> insertVenta(Map<String, dynamic> ventaData, String token) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/Jackenail/RegistrarVenta'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',  
+    },
+    body: json.encode(ventaData),
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception('Error al registrar la venta');
+  }
+}
+
 
   // Obtener adiciones desde la API
   Future<List<Map<String, dynamic>>> getAdiciones() async {
@@ -78,15 +127,26 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> deleteVenta(int id) async {
-    final response = await http.delete(
-      Uri.parse('$baseUrl/ventas/$id'),
-    );
+Future<void> anularVenta(int id) async {
+  final response = await http.put(
+    Uri.parse('$baseUrl/Jackenail/CambiarEstado/$id'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, int>{
+      'Estado': 3,  
+    }),
+  );
 
-    if (response.statusCode != 200) {
-      throw Exception('Error al eliminar la venta');
-    }
+  if (response.statusCode == 200) {
+    return; 
+  } else if (response.statusCode == 403) {
+    throw Exception('403'); 
+  } else {
+    throw Exception('Error al anular la venta');
   }
+}
+
 
   Future<int> getCountVentas() async {
     try {

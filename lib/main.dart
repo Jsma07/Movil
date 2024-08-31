@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:primer_proyecto/CancelarVenta.dart';
 import 'package:primer_proyecto/CrearVenta.dart';
 import 'package:primer_proyecto/CustomBottomNavigationBar.dart';
 import 'package:primer_proyecto/Login.dart';
@@ -10,10 +9,6 @@ import 'package:intl/intl.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de inicializar Flutter
-
-  // Inicializa la base de datos
-  // await DatabaseHelper().initDatabase();
-
   runApp(const MyApp());
 }
 
@@ -49,8 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _loadVentas() async {
     try {
       DatabaseHelper databaseHelper = DatabaseHelper();
-      ventas = await databaseHelper.getVentas(); // Obtener ventas desde la API
-      setState(() {}); // Actualizar la interfaz después de cargar las ventas
+      ventas = await databaseHelper.getVentas(); 
+      setState(() {}); 
     } catch (e) {
       print('Error al cargar las ventas: $e');
     }
@@ -58,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<int> _getTotalVentas() async {
     try {
-      // Llamar al método en DatabaseHelper que obtiene el total de ventas
       DatabaseHelper databaseHelper = DatabaseHelper();
       int totalVentas = await databaseHelper.getCountVentas();
       return totalVentas;
@@ -68,15 +62,45 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  String formatToCOP(num amount) {
-    final format = NumberFormat.currency(
-      locale: 'es_CO',
-      symbol: '\$',
-      decimalDigits: 0,
-      customPattern: '\u00A4#,##0',
-    );
-    return format.format(amount.toDouble());
+Widget estadoWidget(int estado) {
+  Color backgroundColor;
+  Color textColor;
+  String estadoTexto;
+
+  switch (estado) {
+    case 1:
+      backgroundColor = const Color.fromARGB(255, 111, 190, 114); 
+      textColor = Colors.white;
+      estadoTexto = 'Vendido';
+      break;
+    case 2:
+      backgroundColor = const Color.fromRGBO(112, 185, 244, 1); 
+      textColor = Colors.white;
+      estadoTexto = 'En proceso';
+      break;
+    case 3:
+      backgroundColor = Colors.red; 
+      textColor = Colors.white;
+      estadoTexto = 'Anulada';
+      break;
+    default:
+      backgroundColor = Colors.grey; 
+      textColor = Colors.black;
+      estadoTexto = 'Desconocido';
   }
+
+  return Container(
+    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+    decoration: BoxDecoration(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Text(
+      estadoTexto,
+      style: TextStyle(color: textColor),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +130,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
-                                          return const CircularProgressIndicator(); // Muestra un indicador de carga mientras se obtiene el total de ventas
+                                          return const CircularProgressIndicator(); 
                                         } else {
                                           if (snapshot.hasError) {
                                             return const Text(
-                                                'Error al cargar las ventas'); // Maneja errores si falla la obtención de datos
+                                                'Error al cargar las ventas'); 
                                           } else {
                                             final totalVentas =
                                                 snapshot.data ?? 0;
@@ -312,11 +336,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             height: 40,
                             child: IconButton(
                               onPressed: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //       builder: (context) => const CrearVenta()),
-                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const CrearVenta()),
+                                );
                               },
                               icon: const Icon(Icons.add),
                               color: Colors.white,
@@ -327,59 +351,65 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: ventas.length,
-                      itemBuilder: (context, index) {
-                        final venta = ventas[index];
-                        final nombreServicio =
-                            venta['servicio']['Nombre_Servicio'] ?? 'Producto';
-                        final imageUrl = venta['servicio']['ImgServicio'] ?? '';
-                        final precioServicio =
-                            venta['servicio']['Precio_Servicio'] ?? '0.00';
+                   Expanded(
+  child: ListView.builder(
+    itemCount: ventas.length,
+    itemBuilder: (context, index) {
+      final venta = ventas[index];
+      final nombreServicio = venta['servicio']['Nombre_Servicio'] ?? 'Producto';
+      final imageUrl = venta['servicio']['ImgServicio'] ?? '';
+      final total = venta['Total'] ?? '0.00';
+      final estadoVenta = venta['Estado'];
 
-                        // Construye la URL completa de la imagen
-                        final validImageUrl = imageUrl.isNotEmpty
-                            ? 'http://localhost:5000$imageUrl'
-                            : 'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg';
+      // Formatear el total a pesos colombianos y sin decimales
+      final formatCurrency = NumberFormat.currency(locale: 'es_CO', symbol: '\$');
+      final totalFormatted = formatCurrency.format(total).split(',')[0];
 
-                        return buildSalesListItem(
-                          title: nombreServicio,
-                          imageWidget: Image.network(
-                            validImageUrl,
-                            errorBuilder: (context, error, stackTrace) {
-                              print(
-                                  'Error cargando la imagen: $error'); // Para depuración
-                              return Image.network(
-                                'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg',
-                                fit: BoxFit.cover,
-                              );
-                            },
-                            fit: BoxFit.cover,
-                          ),
-                          subtitle: 'Precio: ${formatToCOP(precioServicio)}',
-                          onVisibilityTap: () {
-                            print('Tapped visibility for venta: $venta');
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetalleInsumo(
-                                  imageUrl: validImageUrl,
-                                  productName: nombreServicio,
-                                ),
-                              ),
-                            );
-                          },
-                          onCancelTap: () {
-                            _onCancelTap(index);
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
+      // Construye la URL completa de la imagen
+      final validImageUrl = imageUrl.isNotEmpty
+          ? 'http://localhost:5000$imageUrl'
+          : 'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg';
+
+      return buildSalesListItem(
+        title: nombreServicio,
+        imageWidget: Image.network(
+          validImageUrl,
+          errorBuilder: (context, error, stackTrace) {
+            print('Error cargando la imagen: $error');
+            return Image.network(
+              'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg',
+              fit: BoxFit.cover,
+            );
+          },
+          fit: BoxFit.cover,
+        ),
+        subtitle: 'Precio: \$${totalFormatted}',
+        estado: estadoWidget(estadoVenta), // Usa estadoWidget aquí
+        onVisibilityTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetalleInsumo(
+                imageUrl: validImageUrl,
+                productName: nombreServicio,
               ),
-      ),
+            ),
+          );
+        },
+        // Mostrar el botón de anular solo si la venta no está anulada
+        onCancelTap: estadoVenta != 3 
+      ? () {
+          _onCancelTap(context, index);
+        }
+      : null,  
+      showCancelButton: estadoVenta != 3,
+      );
+    },
+  ),
+),
+              ],
+            ),
+    ),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
@@ -387,28 +417,85 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _onCancelTap(int index) async {
+ void _onCancelTap(BuildContext context, int index) async {
+  try {
+    if (index < 0 || index >= ventas.length) {
+      print('Índice de venta fuera de rango');
+      return;
+    }
+
+    final ventaId = ventas[index]['idVentas'];
+
+    if (ventaId == null) {
+      print('El ID de la venta es nulo');
+      return;
+    }
+
+    DatabaseHelper databaseHelper = DatabaseHelper();
+
+    // Verifica si la venta puede ser anulada
     try {
-      // Verificar que el índice esté dentro del rango de la lista de ventas
-      if (index < 0 || index >= ventas.length) {
-        print('Índice de venta fuera de rango');
+      await databaseHelper.anularVenta(ventaId);
+    } catch (e) {
+      if (e.toString() == 'Exception: 403') {
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('No se puede anular'),
+              content: const Text('Lo siento, no se puede anular porque ya pasó el tiempo permitido.'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Aceptar'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return; 
+      } else {
+        print('Error al anular la venta: $e');
         return;
       }
-
-      // Obtener el ID de la venta del elemento seleccionado en la lista
-      final ventaId = ventas[index]['idVenta'];
-
-      // Llamar al método en DatabaseHelper para eliminar la venta por su ID
-      DatabaseHelper databaseHelper = DatabaseHelper();
-      await databaseHelper.deleteVenta(ventaId);
-
-      // Actualizar la lista de ventas después de eliminar el registro
-      await _loadVentas();
-    } catch (e) {
-      print('Error al eliminar la venta: $e');
-      // Manejar cualquier error que ocurra durante la eliminación
     }
+
+    final shouldCancel = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmar anulación'),
+          content: const Text('¿Estás segura de que quieres anular esta venta?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: const Text('Aceptar'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldCancel == true) {
+      setState(() {
+        ventas[index]['Estado'] = 3; 
+      });
+      await _loadVentas();
+    }
+  } catch (e) {
+    print('Error al anular la venta: $e');
   }
+}
 
   void _onTabTapped(int index) {
     setState(() {
@@ -423,10 +510,10 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 1:
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => const CrearVenta()),
-      // );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CrearVenta()),
+      );
       case 2:
         Login.destroySession(context);
 
@@ -435,43 +522,58 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Widget buildSalesListItem({
-    required String title,
-    required Widget imageWidget,
-    required String subtitle,
-    required Function() onVisibilityTap,
-    required Function() onCancelTap,
-  }) {
-    return Card(
-      child: ListTile(
-        leading: Container(
-          width: 50,
-          height: 50,
-          child: ClipOval(
-            child: imageWidget, // Envolver la imagen en ClipOval
-          ),
+Widget buildSalesListItem({
+  required String title,
+  required Widget imageWidget,
+  required String subtitle,
+  required Widget estado,
+  required Function() onVisibilityTap,
+  Function()? onCancelTap, 
+  bool showCancelButton = true, 
+}) {
+  return Card(
+    child: ListTile(
+      leading: Container(
+        width: 50,
+        height: 50,
+        child: ClipOval(
+          child: imageWidget,
         ),
-        title: Text(title),
-        subtitle: Text(subtitle),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: onVisibilityTap,
-              child: Container(
-                width: 35,
-                height: 35,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color.fromRGBO(112, 185, 244, 1),
-                ),
-                child: const Icon(
-                  Icons.visibility,
-                  color: Colors.white,
-                ),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold, // Título en negrita
+        ),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(subtitle),
+          const SizedBox(height: 4),
+          estado, // Usa el widget de estado aquí
+        ],
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: onVisibilityTap,
+            child: Container(
+              width: 35,
+              height: 35,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color.fromRGBO(112, 185, 244, 1),
+              ),
+              child: const Icon(
+                Icons.visibility,
+                color: Colors.white,
               ),
             ),
-            const SizedBox(width: 10),
+          ),
+          const SizedBox(width: 10),
+          if (showCancelButton) 
             GestureDetector(
               onTap: onCancelTap,
               child: Container(
@@ -487,9 +589,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
