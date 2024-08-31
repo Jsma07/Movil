@@ -19,7 +19,7 @@ class DatabaseHelper {
         if (responseData['user'] != null &&
             responseData['user']['id'] != null) {
           print('Token recibido: $token');
-          return token; // Devuelve el token si el inicio de sesión es exitoso
+          return token;
         } else {
           print('Usuario no encontrado en la tabla usuarios');
           return null;
