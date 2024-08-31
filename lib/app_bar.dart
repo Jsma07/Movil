@@ -33,7 +33,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color.fromARGB(230, 98, 196, 221),
+                  Color.fromARGB(230, 204, 160, 211),
                   Color.fromARGB(255, 255, 255, 255),
                 ],
               ),
@@ -56,7 +56,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     backgroundImage: NetworkImage(leftAvatarImageUrl),
                   ),
                   Text(
-                    'Jacke Nail',
+                    'Jake Nails',
                     style: TextStyle(
                       color: textColor,
                       fontSize: 20.0,

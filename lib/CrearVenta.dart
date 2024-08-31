@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:primer_proyecto/Adiciones.dart';
 import 'package:primer_proyecto/main.dart';
 import 'package:primer_proyecto/Login.dart';
+import 'package:intl/intl.dart';
 import 'Databasehelper.dart' as DBHelper;
 import 'package:http/http.dart' as http;
 
@@ -13,9 +14,9 @@ class Venta {
   int servicioId;
   DateTime fechaVenta;
   int estadoVenta;
-  final double subtotal; 
-  final double descuento; 
-  final double total; 
+  final double subtotal;
+  final double descuento;
+  final double total;
 
   Venta({
     required this.empleadoId,
@@ -23,9 +24,9 @@ class Venta {
     required this.servicioId,
     required this.fechaVenta,
     required this.estadoVenta,
-     required this.subtotal, 
+    required this.subtotal,
     required this.descuento,
-    required this.total, 
+    required this.total,
   });
 
   Map<String, dynamic> toMap() {
@@ -35,6 +36,9 @@ class Venta {
       'idServicio': servicioId,
       'Fecha': fechaVenta.toIso8601String(),
       'Estado': estadoVenta,
+      'Subtotal': subtotal,
+      'Descuento': descuento,
+      'Total': total,
     };
   }
 }
@@ -55,12 +59,20 @@ class _CrearVentaState extends State<CrearVenta> {
   List<Map<String, dynamic>> servicios = [];
   final _formKey = GlobalKey<FormState>();
   DateTime _fechaVenta = DateTime.now();
+  final TextEditingController _descuentoController = TextEditingController();
+  final TextEditingController _fechaVentaController = TextEditingController();
+  double _total = 0.0;
+  double _subtotal = 0.0;
 
   @override
   void initState() {
     super.initState();
     _cargarClientesYEmpleados();
     _cargarServicios();
+    _actualizarFechaVenta();
+    _descuentoController.addListener(() {
+      _actualizarTotal();
+    });
   }
 
   Future<void> _cargarClientesYEmpleados() async {
@@ -95,83 +107,133 @@ class _CrearVentaState extends State<CrearVenta> {
     }
   }
 
-void _guardarVenta(BuildContext context) async {
-  if (_formKey.currentState!.validate()) {
-    try {
-      // Recupera el token de SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('authToken');
-      print('Token recuperado: $token');
+  void _actualizarFechaVenta() {
+    DateTime ahora = DateTime.now();
+    String fechaFormateada =
+        '${ahora.day}/${ahora.month}/${ahora.year} ${ahora.hour}:${ahora.minute}';
+    _fechaVentaController.text = fechaFormateada;
+    _fechaVenta = ahora;
+  }
 
-      if (token == null) {
-        print('Error: No se encontró el token');
+  final formatCurrency = NumberFormat.currency(locale: 'es_CO', symbol: '\$');
+
+  Future<void> _guardarVenta(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String? token = prefs.getString('authToken');
+        print('Token recuperado: $token');
+
+        if (token == null) {
+          print('Error: No se encontró el token');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Error de autenticación. Intente iniciar sesión de nuevo.'),
+            ),
+          );
+          return;
+        }
+
+        double subtotal = _calcularSubtotal();
+        double descuento = _calcularDescuento(subtotal);
+        double total = subtotal - descuento;
+
+        print('Subtotal: $subtotal');
+        print('Descuento: $descuento');
+        print('Total: $total');
+
+        Venta nuevaVenta = Venta(
+          empleadoId: _empleadoId!,
+          clienteId: _clienteId!,
+          servicioId: _servicioId!,
+          fechaVenta: _fechaVenta,
+          estadoVenta: 1,
+          subtotal: subtotal,
+          descuento: descuento,
+          total: total,
+        );
+
+        final response = await http.post(
+          Uri.parse('http://192.168.100.44:5000/Jackenail/RegistrarVenta'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: json.encode(nuevaVenta.toMap()),
+        );
+
+        if (response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Venta registrada correctamente'),
+            ),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MyHomePage()),
+          );
+        } else {
+          throw Exception('Error al registrar la venta');
+        }
+      } catch (e) {
+        print('Error al guardar la venta: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Error de autenticación. Intente iniciar sesión de nuevo.'),
+            content: Text('Error al guardar la venta'),
           ),
         );
-        return; 
       }
-
-      // Suponiendo que tienes lógicas para calcular Subtotal, Descuento y Total
-      double subtotal = _calcularSubtotal();
-      double descuento = _calcularDescuento(subtotal);
-      double total = subtotal - descuento;
-
-      Venta nuevaVenta = Venta(
-        empleadoId: _empleadoId!,
-        clienteId: _clienteId!,
-        servicioId: _servicioId!,
-        fechaVenta: _fechaVenta,
-        estadoVenta: 1,
-        subtotal: subtotal, 
-        descuento: descuento, 
-        total: total, 
-      );
-
-      final response = await http.post(
-        Uri.parse('http://192.168.75.66:5000/Jackenail/RegistrarVenta'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode(nuevaVenta.toMap()),
-      );
-
-      if (response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Venta registrada correctamente'),
-          ),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MyHomePage()),
-        );
-      } else {
-        throw Exception('Error al registrar la venta');
-      }
-    } catch (e) {
-      print('Error al guardar la venta: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error al guardar la venta'),
-        ),
-      );
     }
   }
-}
 
-double _calcularSubtotal() {
+  void _actualizarTotal() {
+    double subtotal = _calcularSubtotal();
+    double descuento = _calcularDescuento(subtotal);
+    setState(() {
+      _total = subtotal - descuento;
+    });
+  }
 
-  return 100.0; 
-}
+  double _calcularSubtotal() {
+    if (_servicioId == null) {
+      print('Error: ID del servicio es null');
+      return 0.0;
+    }
 
-double _calcularDescuento(double subtotal) {
-  
-  return 10.0; 
-}
+    final servicioSeleccionado = servicios.firstWhere(
+      (servicio) => servicio['IdServicio'] == _servicioId,
+      orElse: () => {},
+    );
 
+    if (servicioSeleccionado.isEmpty) {
+      print('Error: No se encontró el servicio con ID $_servicioId');
+      return 0.0;
+    }
+
+    double precioServicio = 0.0;
+
+    if (servicioSeleccionado.containsKey('Precio_Servicio')) {
+      String precioString = servicioSeleccionado['Precio_Servicio'];
+      precioString = precioString.replaceAll('.', '').replaceAll(',', '.');
+      precioServicio = double.tryParse(precioString) ?? 0.0;
+    }
+
+    print('Subtotal calculado: $precioServicio');
+    return precioServicio;
+  }
+
+  double _calcularDescuento(double subtotal) {
+    String descuentoTexto = _descuentoController.text;
+    double descuento = double.tryParse(descuentoTexto) ?? 0.0;
+
+    if (descuento > subtotal) {
+      descuento = subtotal;
+    }
+
+    print('Descuento aplicado: $descuento');
+    return descuento;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +253,7 @@ double _calcularDescuento(double subtotal) {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color.fromARGB(230, 98, 196, 221),
+                    Color.fromARGB(230, 204, 160, 211),
                     Color.fromARGB(255, 255, 255, 255),
                   ],
                 ),
@@ -216,7 +278,7 @@ double _calcularDescuento(double subtotal) {
                           'https://i.pinimg.com/564x/85/53/5e/85535e2d471e0f036ae4492327581c3e.jpg'),
                     ),
                     Text(
-                      'Jacke Nail',
+                      'Jake Nails',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20.0,
@@ -317,15 +379,57 @@ double _calcularDescuento(double subtotal) {
                     const SizedBox(
                         height:
                             30), //realizo el espacio entre los botones y los selects
-
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
                           const SizedBox(height: 10),
+                          // Nombre del Servicio
                           DropdownButtonFormField<String>(
                             decoration: InputDecoration(
-                              hintText: 'Nombre del empleado',
+                              hintText: 'Servicio',
+                              hintStyle:
+                                  const TextStyle(fontWeight: FontWeight.w600),
+                              prefixIcon: const Icon(Icons.local_atm),
+                              fillColor: Colors.grey.shade200,
+                              filled: true,
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            items: servicios.map((servicios) {
+                              return DropdownMenuItem<String>(
+                                value: servicios['Nombre_Servicio'],
+                                child: Text(servicios['Nombre_Servicio']),
+                              );
+                            }).toList(),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Por favor seleccione el nombre del servicio';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              setState(() {
+                                _servicioId = servicios.firstWhere((serv) =>
+                                    serv['Nombre_Servicio'] ==
+                                    value)['IdServicio'];
+                                _actualizarTotal();
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 25),
+                          // Nombre del Empleado
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              hintText: 'Manicurista',
                               hintStyle:
                                   const TextStyle(fontWeight: FontWeight.w600),
                               prefixIcon: const Icon(Icons.business),
@@ -366,9 +470,10 @@ double _calcularDescuento(double subtotal) {
                             },
                           ),
                           const SizedBox(height: 25),
+                          // Nombre del Cliente
                           DropdownButtonFormField<String>(
                             decoration: InputDecoration(
-                              hintText: 'Nombre del Cliente',
+                              hintText: 'Cliente',
                               hintStyle:
                                   const TextStyle(fontWeight: FontWeight.w600),
                               prefixIcon: const Icon(Icons.account_circle),
@@ -398,21 +503,21 @@ double _calcularDescuento(double subtotal) {
                               return null;
                             },
                             onChanged: (value) {
-                              _clienteId = int.parse(
-                                  value!); 
+                              _clienteId = int.parse(value!);
                             },
                             onSaved: (value) {
-                              _clienteId = int.parse(
-                                  value!); 
+                              _clienteId = int.parse(value!);
                             },
                           ),
                           const SizedBox(height: 25),
-                          DropdownButtonFormField<String>(
+                          // Campo para Descuento
+                          TextFormField(
+                            controller: _descuentoController,
                             decoration: InputDecoration(
-                              hintText: 'Nombre del Servicio',
+                              hintText: 'Descuento',
                               hintStyle:
                                   const TextStyle(fontWeight: FontWeight.w600),
-                              prefixIcon: const Icon(Icons.local_atm),
+                              prefixIcon: const Icon(Icons.percent),
                               fillColor: Colors.grey.shade200,
                               filled: true,
                               contentPadding:
@@ -426,92 +531,46 @@ double _calcularDescuento(double subtotal) {
                                 borderRadius: BorderRadius.circular(25),
                               ),
                             ),
-                            items: servicios.map((servicios) {
-                              return DropdownMenuItem<String>(
-                                value: servicios['Nombre_Servicio'],
-                                child: Text(servicios['Nombre_Servicio']),
-                              );
-                            }).toList(),
+                            onChanged: (_) => _actualizarTotal(),
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 25),
+                          // Fecha de la venta
+                          TextFormField(
+                            decoration: InputDecoration(
+                              hintText: 'Fecha de la venta',
+                              hintStyle:
+                                  const TextStyle(fontWeight: FontWeight.w600),
+                              prefixIcon: const Icon(Icons.calendar_today),
+                              fillColor: Colors.grey.shade200,
+                              filled: true,
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              disabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            readOnly: true,
+                            controller: _fechaVentaController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Por favor seleccione el nombre del empleado';
+                                return 'Por favor seleccione la fecha de la venta';
                               }
                               return null;
                             },
-                            onChanged: (value) {
-                              setState(() {
-                                _servicioId = servicios.firstWhere((serv) =>
-                                    serv['Nombre_Servicio'] ==
-                                    value)['IdServicio'];
-                              });
-                            },
+                            enabled: false,
                           ),
-                          const SizedBox(height: 25),
-                          TextFormField(
-                              decoration: InputDecoration(
-                                hintText: 'Fecha de la venta',
-                                hintStyle: const TextStyle(
-                                    fontWeight: FontWeight.w600),
-                                prefixIcon: const Icon(Icons.calendar_today),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                              ),
-                              readOnly: true,
-                              onTap: () async {
-                                final DateTime currentDate = DateTime.now();
-                                final DateTime firstSelectableDate =
-                                    currentDate.subtract(const Duration(
-                                        days:
-                                            15)); // 15 días antes de la fecha actual
-                                final DateTime lastSelectableDate =
-                                    currentDate; // La fecha actual como fecha máxima
-
-                                final pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: _fechaVenta,
-                                  firstDate: firstSelectableDate,
-                                  lastDate: lastSelectableDate,
-                                  builder:
-                                      (BuildContext context, Widget? child) {
-                                    return Theme(
-                                      data: ThemeData.light().copyWith(
-                                        colorScheme: const ColorScheme.light(
-                                          background: Colors.purple,
-                                        ),
-                                      ),
-                                      child: child!,
-                                    );
-                                  },
-                                );
-
-                                if (pickedDate != null &&
-                                    pickedDate != _fechaVenta) {
-                                  setState(() {
-                                    _fechaVenta = pickedDate;
-                                  });
-                                }
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Por favor seleccione la fecha de la venta';
-                                }
-                                return null;
-                              },
-                              controller: TextEditingController(
-                                text:
-                                    '${_fechaVenta.day}/${_fechaVenta.month}/${_fechaVenta.year}',
-                              )),
                           const SizedBox(height: 40),
+                          // Botones
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -519,15 +578,15 @@ double _calcularDescuento(double subtotal) {
                                 width: 140,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    // Acción del primer botón
+                                    // Acción del botón
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
                                         const Color.fromARGB(255, 12, 12, 12),
                                   ),
-                                  child: const Text(
-                                    'Total: ',
-                                    style: TextStyle(
+                                  child: Text(
+                                    'Total: ${formatCurrency.format(_total).split(',')[0]}',
+                                    style: const TextStyle(
                                       color: Color.fromARGB(255, 244, 245, 246),
                                     ),
                                   ),
@@ -538,8 +597,7 @@ double _calcularDescuento(double subtotal) {
                                 width: 140,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    _guardarVenta(
-                                        context); 
+                                    _guardarVenta(context);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue,
