@@ -1,102 +1,51 @@
 import 'package:flutter/material.dart';
-import 'CrearVenta.dart';
-import 'package:primer_proyecto/main.dart';
-import 'fondo_pantalla.dart'; // Asegúrate de tener este import correcto
+import 'package:intl/intl.dart'; // Importa el paquete intl
+import 'fondo_pantalla.dart';
 import 'cards_detalles.dart';
-import 'CustomBottomNavigationBar.dart'; // Asegúrate de tener este import correcto
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-class DetalleInsumo extends StatefulWidget {
+class DetalleInsumo extends StatelessWidget {
   final String imageUrl;
   final String productName;
+  final Map<String, dynamic>? detallesVenta;
 
   const DetalleInsumo({
-    super.key,
+    Key? key,
     required this.imageUrl,
     required this.productName,
-  });
-
-  @override
-  _DetalleInsumoState createState() => _DetalleInsumoState();
-}
-
-class _DetalleInsumoState extends State<DetalleInsumo> {
-  bool _isLoading = false;
-  int _currentIndex = 0;
-  Map<String, dynamic>? _detalleVenta;
-
-  final String baseUrl =
-      'http://192.168.100.44:5000'; // Asegúrate de que la URL sea correcta
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchDetalleVenta(28); // Reemplaza 28 con el ID correcto si es necesario
-  }
-
-  Future<void> _fetchDetalleVenta(int id) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/Buscardetalle/$id'),
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        if (data.isNotEmpty) {
-          setState(() {
-            _detalleVenta = data[0];
-          });
-        }
-      } else {
-        print('Error al obtener el detalle de la venta: ${response.body}');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  const MyHomePage()), // Pasa los parámetros necesarios
-        );
-        break;
-      case 1:
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //       builder: (context) =>
-        //           const CrearVenta()), // Reemplaza CrearVenta con la página de destino correcta
-        // );
-        break;
-      case 2:
-        // Agrega el código para la tercera página si es necesario
-        break;
-    }
-  }
+    this.detallesVenta,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<String> images = [
-      'https://www.cosmeticosghelic.com/wp-content/uploads/2020/09/coleccion-pastel.jpeg',
-      'https://http2.mlstatic.com/D_NQ_NP_780729-MCO45480256626_042021-O.webp',
-      'https://down-co.img.susercontent.com/file/f6b75a7d1c4a1423d685c7836a1b42b1',
-      'https://bplus.com.co/wp-content/uploads/2021/05/LIMP.jpg'
-    ];
+    print('Detalles de la venta: $detallesVenta');
 
-    List<String> texts = ['Esmaltes', 'Limas', 'Gel', 'Desinfectante'];
+    if (detallesVenta == null || detallesVenta!.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Detalle de $productName'),
+        ),
+        body: const Center(
+          child: Text('No se encontraron detalles de la venta.'),
+        ),
+      );
+    }
+
+    final venta = detallesVenta!['venta'] as Map<String, dynamic>? ?? {};
+    final cliente = venta['cliente'] as Map<String, dynamic>? ?? {};
+    final empleado = venta['empleado'] as Map<String, dynamic>? ?? {};
+    final adiciones = detallesVenta!['adiciones'] as List<dynamic>? ?? [];
+
+    // Crea una instancia de NumberFormat para formatear como moneda
+    final numberFormat = NumberFormat('#,##0', 'es_CO');
+
+    // Función para formatear valores monetarios
+    String formatCurrency(double value) {
+      return '\$${numberFormat.format(value)}';
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalle de ${widget.productName}'),
+        title: const Text('Detalle de venta'),
       ),
       body: Stack(
         children: [
@@ -104,131 +53,191 @@ class _DetalleInsumoState extends State<DetalleInsumo> {
             imageUrl:
                 'https://i.pinimg.com/736x/71/7d/ce/717dce3d21e998822a3ca37065b932d3.jpg',
           ),
-          Positioned(
-            top: 30, // Baja la posición
-            left: 0,
-            right: 0,
+          SingleChildScrollView(
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 60, // Reducir el tamaño de la imagen
-                  backgroundImage: NetworkImage(widget.imageUrl),
-                ),
-                const SizedBox(height: 10), // Ajusta el espacio
-                Text(
-                  widget.productName,
-                  style: const TextStyle(
-                    fontSize:
-                        20, // Aumenta el tamaño de la fuente si es necesario
-                    fontWeight: FontWeight.bold,
+                SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: CircleAvatar(
+                      radius: 70,
+                      backgroundImage: NetworkImage(imageUrl),
+                      onBackgroundImageError: (error, stackTrace) {
+                        print('Error cargando la imagen principal: $error');
+                      },
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20), // Espacio para nuevo contenido
-                if (_detalleVenta != null) ...[
-                  // Mostrar detalles de la venta
-                  Text(
-                    'Cliente: ${_detalleVenta!['venta']['cliente']['Nombre']} ${_detalleVenta!['venta']['cliente']['Apellido']}',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    productName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Text(
-                    'Empleado: ${_detalleVenta!['venta']['empleado']['Nombre']} ${_detalleVenta!['venta']['empleado']['Apellido']}',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                const SizedBox(height: 20),
+                if (cliente.isNotEmpty ||
+                    empleado.isNotEmpty ||
+                    venta.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildInfoRow(
+                              icon: Icons.calendar_today,
+                              title: 'Fecha:',
+                              value: '${venta['Fecha'] ?? 'Desconocida'}',
+                              iconColor: Colors.grey,
+                            ),
+                            if (cliente.isNotEmpty)
+                              _buildInfoRow(
+                                icon: Icons.person,
+                                title: 'Cliente:',
+                                value:
+                                    '${cliente['Nombre'] ?? 'Desconocido'} ${cliente['Apellido'] ?? ''}',
+                                iconColor: Colors.blue,
+                              ),
+                            if (empleado.isNotEmpty)
+                              _buildInfoRow(
+                                icon: Icons.work,
+                                title: 'Empleado:',
+                                value:
+                                    '${empleado['Nombre'] ?? 'Desconocido'} ${empleado['Apellido'] ?? ''}',
+                                iconColor: Colors.green,
+                              ),
+                            if (venta.isNotEmpty)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildInfoRow(
+                                    icon: Icons.discount,
+                                    title: 'Descuento:',
+                                    value: formatCurrency(
+                                        venta['Descuento']?.toDouble() ?? 0),
+                                    iconColor: Colors.red,
+                                  ),
+                                  _buildInfoRow(
+                                    icon: Icons.monetization_on,
+                                    title: 'Subtotal:',
+                                    value: formatCurrency(
+                                        venta['Subtotal']?.toDouble() ?? 0),
+                                    iconColor: Colors.orange,
+                                  ),
+                                  _buildInfoRow(
+                                    icon: Icons.attach_money,
+                                    title: 'Total:',
+                                    value: formatCurrency(
+                                        venta['Total']?.toDouble() ?? 0),
+                                    iconColor: Colors.purple,
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  Text(
-                    'Subtotal: ${_detalleVenta!['venta']['Subtotal']}',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                  Text(
-                    'Total: ${_detalleVenta!['venta']['Total']}',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ] else ...[
-                  const Text(
-                    'Cargando detalles...',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                if (adiciones.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Center(
+                          child: Text(
+                            'Adiciones',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                            height:
+                                10), // Espacio entre el título y el carrusel
+                        SizedBox(
+                          height: 200, // Ajusta la altura según el diseño
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: adiciones.length,
+                            itemBuilder: (context, index) {
+                              final adicion =
+                                  adiciones[index] as Map<String, dynamic>;
+                              final imgUrl =
+                                  'http://192.168.100.44:5000/uploads/${adicion['Img'] ?? ''}';
+                              return Container(
+                                width: 150, // Ajusta el ancho aquí
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: ProductCard(
+                                  imageUrl: imgUrl,
+                                  productName:
+                                      adicion['NombreAdiciones']?.toString() ??
+                                          'No nombre',
+                                  price: formatCurrency(
+                                      adicion['Precio']?.toDouble() ?? 0),
+                                  units:
+                                      'N/A', // Ajusta esto si tienes información sobre unidades
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
                 ],
               ],
             ),
           ),
-          Positioned(
-            top: 350,
-            left: 0,
-            right: 0,
-            child: SizedBox(
-              height: 209,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    const SizedBox(width: 7),
-                    ...images.asMap().entries.map((entry) {
-                      return GestureDetector(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Mantener presionado'),
-                              duration: Duration(milliseconds: 500),
-                            ),
-                          );
-                        },
-                        onLongPress: () {
-                          if (!_isLoading) {
-                            setState(() {
-                              _isLoading = true;
-                            });
-
-                            Future.delayed(const Duration(seconds: 1), () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DetalleInsumo(
-                                    imageUrl: entry.value,
-                                    productName: texts[entry.key],
-                                  ),
-                                ),
-                              ).then((_) {
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              });
-                            });
-                          }
-                        },
-                        child: ProductCard(
-                          imageUrl: entry.value,
-                          productName: texts[entry.key],
-                          price: '\$40.000',
-                          units: '1',
-                        ),
-                      );
-                    }),
-                    const SizedBox(width: 8),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          if (_isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
         ],
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
       ),
     );
   }
-}
 
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: DetalleInsumo(
-      imageUrl: 'URL_DE_LA_IMAGEN',
-      productName: 'NOMBRE_DEL_PRODUCTO',
-    ),
-  ));
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String title,
+    required String value,
+    required Color iconColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 8.0),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 8.0),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

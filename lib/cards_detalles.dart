@@ -46,7 +46,7 @@ class ProductCard extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               Text(
-                'Unidades: $units',
+                'Cantidad: $units',
                 style: const TextStyle(
                   fontSize: 14,
                 ),

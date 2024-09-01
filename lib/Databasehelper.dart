@@ -163,16 +163,28 @@ class DatabaseHelper {
     }
   }
 
-  // Método para obtener el detalle de una venta por su ID
   Future<Map<String, dynamic>?> getDetalleVenta(int id) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/Buscardetalle/$id'),
       );
 
+      print(
+          'Respuesta de la API: ${response.body}'); // Imprime el cuerpo de la respuesta
+
       if (response.statusCode == 200) {
-        final Map<String, dynamic> detalleVenta = json.decode(response.body);
-        return detalleVenta;
+        final data = json.decode(response.body);
+
+        if (data is List && data.isNotEmpty) {
+          print('Detalle completo: ${data[0]}');
+          return data[0] as Map<String, dynamic>;
+        } else if (data is Map<String, dynamic>) {
+          print('Detalle completo: $data');
+          return data;
+        } else {
+          print('Formato inesperado de datos.');
+          return null;
+        }
       } else {
         print('Error al obtener el detalle de la venta: ${response.body}');
         return null;

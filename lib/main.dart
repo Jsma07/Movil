@@ -302,6 +302,54 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  // Barra de búsqueda
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset:
+                              Offset(0, 3), // Cambia la posición de la sombra
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search,
+                            color: Colors.blue), // Icono de la lupa
+                        border: InputBorder.none, // Sin borde
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(
+                            color: Colors
+                                .blue, // Color del borde cuando está enfocado
+                            width: 2.0, // Ancho del borde
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(
+                            color: Colors
+                                .transparent, // Color del borde cuando no está enfocado
+                            width: 1.0,
+                          ),
+                        ),
+                        hintText: 'Buscar ventas...',
+                        hintStyle: TextStyle(color: Colors.grey[600]),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 12.0),
+                      ),
+                      onChanged: (text) {
+                        // Aquí puedes añadir la lógica para filtrar la lista de ventas
+                      },
+                    ),
+                  ),
                   const SizedBox(height: 2),
                   Expanded(
                     child: ListView.builder(
@@ -322,7 +370,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                         // Construye la URL completa de la imagen
                         final validImageUrl = imageUrl.isNotEmpty
-                            ? 'http://localhost:5000$imageUrl'
+                            ? 'http://192.168.100.44:5000$imageUrl'
                             : 'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg';
 
                         return buildSalesListItem(
@@ -338,20 +386,55 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                             fit: BoxFit.cover,
                           ),
-                          subtitle: 'Precio: \$$totalFormatted',
-                          estado: estadoWidget(
-                              estadoVenta), // Usa estadoWidget aquí
-                          onVisibilityTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetalleInsumo(
-                                  imageUrl: validImageUrl,
-                                  productName: nombreServicio,
+                          subtitle: 'Total: \$$totalFormatted',
+                          estado: estadoWidget(estadoVenta),
+                          onVisibilityTap: () async {
+                            int? ventaId = venta['idVentas'];
+
+                            if (ventaId != null) {
+                              print('Id detalle venta: $ventaId');
+
+                              try {
+                                final detalleVenta = await DatabaseHelper()
+                                    .getDetalleVenta(ventaId);
+
+                                if (detalleVenta != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetalleInsumo(
+                                        imageUrl: validImageUrl,
+                                        productName: nombreServicio,
+                                        detallesVenta: detalleVenta,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'No se encontraron detalles de la venta.'),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                print('Error obteniendo detalles de venta: $e');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Error al conectar con el servidor.'),
+                                  ),
+                                );
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('ID de venta no válido.'),
                                 ),
-                              ),
-                            );
+                              );
+                            }
                           },
+
                           // Mostrar el botón de anular solo si la venta no está anulada
                           onCancelTap: estadoVenta != 3
                               ? () {
@@ -501,7 +584,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(
           title,
           style: const TextStyle(
-            fontWeight: FontWeight.bold, // Título en negrita
+            fontWeight: FontWeight.bold,
           ),
         ),
         subtitle: Column(
@@ -509,7 +592,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Text(subtitle),
             const SizedBox(height: 4),
-            estado, // Usa el widget de estado aquí
+            estado,
           ],
         ),
         trailing: Row(
