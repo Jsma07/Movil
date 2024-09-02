@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Importa el paquete intl
+import 'package:intl/intl.dart';
 import 'fondo_pantalla.dart';
 import 'cards_detalles.dart';
 
@@ -176,7 +176,7 @@ class DetalleInsumo extends StatelessWidget {
                               final imgUrl =
                                   'http://192.168.100.44:5000/uploads/${adicion['Img'] ?? ''}';
                               return Container(
-                                width: 150, // Ajusta el ancho aquí
+                                width: 150,
                                 margin:
                                     const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: ProductCard(
@@ -187,7 +187,7 @@ class DetalleInsumo extends StatelessWidget {
                                   price: formatCurrency(
                                       adicion['Precio']?.toDouble() ?? 0),
                                   units:
-                                      'N/A', // Ajusta esto si tienes información sobre unidades
+                                      'N/A', 
                                 ),
                               );
                             },

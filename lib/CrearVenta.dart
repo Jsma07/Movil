@@ -155,7 +155,7 @@ class _CrearVentaState extends State<CrearVenta> {
         );
 
         final response = await http.post(
-          Uri.parse('http://192.168.100.44:5000/Jackenail/RegistrarVenta'),
+          Uri.parse('http://192.168.18.89:5000/Jackenail/RegistrarVenta'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseHelper {
-  final String baseUrl = 'http://192.168.100.44:5000';
+  final String baseUrl = 'http://192.168.18.89:5000';
 
   Future<String?> login(String email, String password) async {
     try {
@@ -112,7 +112,6 @@ class DatabaseHelper {
 
       if (response.statusCode == 200) {
         List<dynamic> jsonResponse = json.decode(response.body);
-        // Convertir la lista de mapas dinámicos en una lista de mapas con tipo específico
         return jsonResponse
             .map((item) => item as Map<String, dynamic>)
             .toList();
@@ -162,6 +161,27 @@ class DatabaseHelper {
       throw Exception('Error al procesar la respuesta de las ventas: $e');
     }
   }
+
+  Future<Map<String, dynamic>> getTopService() async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/api/serviciomasvendido'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      if (data.isNotEmpty) {
+        // Obtén el primer servicio de la lista
+        final Map<String, dynamic> topService = data[0];
+        return topService;
+      } else {
+        throw Exception('No hay servicios disponibles.');
+      }
+    } else {
+      throw Exception('Error al cargar los servicios: Estado ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error al procesar la respuesta de los servicios: $e');
+  }
+}
 
   Future<Map<String, dynamic>?> getDetalleVenta(int id) async {
     try {

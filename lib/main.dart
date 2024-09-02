@@ -34,22 +34,40 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   List<Map<String, dynamic>> ventas = [];
+  List<Map<String, dynamic>> filteredVentas = [];
+  String searchQuery = '';
+  Map<String, dynamic>? topService;
 
   @override
   void initState() {
     super.initState();
-    _loadVentas(); // Cargar ventas al iniciar la pantalla
+    _loadVentas();
+    _loadTopService(); 
   }
 
-  Future<void> _loadVentas() async {
+Future<void> _loadVentas() async {
+  try {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    ventas = await databaseHelper.getVentas();
+    filteredVentas = ventas; 
+    setState(() {});
+  } catch (e) {
+    print('Error al cargar las ventas: $e');
+  }
+}
+
+
+Future<void> _loadTopService() async {
     try {
       DatabaseHelper databaseHelper = DatabaseHelper();
-      ventas = await databaseHelper.getVentas();
-      setState(() {});
+      final service = await databaseHelper.getTopService();
+      setState(() {
+        topService = service;
+      });
     } catch (e) {
-      print('Error al cargar las ventas: $e');
+      print('Error al cargar el servicio: $e');
     }
-  }
+}
 
   Future<int> _getTotalVentas() async {
     try {
@@ -60,6 +78,18 @@ class _MyHomePageState extends State<MyHomePage> {
       print('Error al obtener el total de ventas: $e');
       return 0;
     }
+  }
+
+  void _filterVentas(String query) {
+    setState(() {
+      searchQuery = query;
+      filteredVentas = ventas
+          .where((venta) =>
+              venta['servicio']['Nombre_Servicio']
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase()))
+          .toList();
+    });
   }
 
   Widget estadoWidget(int estado) {
@@ -219,45 +249,50 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ],
                             ),
-                            child: const Card(
-                              elevation:
-                                  0, // Desactiva la sombra predeterminada del Card
-                              margin:
-                                  EdgeInsets.zero, // Elimina el margen del Card
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Center(
-                                      child: Text(
-                                        'Técnica más vendida',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
+                           child: topService == null
+                            ? const Center(child: CircularProgressIndicator())
+                            : Card(
+                                elevation: 0, // Desactiva la sombra predeterminada del Card
+                                margin: EdgeInsets.zero, // Elimina el margen del Card
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Center(
+                                        child: Text(
+                                          'Técnica más vendida',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 15,
-                                          backgroundImage: NetworkImage(
-                                              'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg'),
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Uñas Acrílicas',
-                                          style: TextStyle(fontSize: 17),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8),
-                                  ],
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 15,
+                                            backgroundImage: NetworkImage(topService!['ImgServicio']),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          SizedBox(
+                                            width: 200,  
+                                            child: Text(
+                                              topService!['Nombre_Servicio'] ?? 'Nombre del servicio',
+                                              style: const TextStyle(fontSize: 17),
+                                              softWrap: true,
+                                              overflow: TextOverflow.visible,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
+
                           ),
                         ),
                       ],
@@ -302,9 +337,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   // Barra de búsqueda
-                  Container(
+                   Container(
+                    width: 350,
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -314,48 +350,35 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Colors.grey.withOpacity(0.2),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset:
-                              Offset(0, 3), // Cambia la posición de la sombra
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
                     child: TextField(
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.search,
-                            color: Colors.blue), // Icono de la lupa
-                        border: InputBorder.none, // Sin borde
+                        prefixIcon: const Icon(Icons.search, color: Colors.blue),
+                        border: InputBorder.none,
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(
-                            color: Colors
-                                .blue, // Color del borde cuando está enfocado
-                            width: 2.0, // Ancho del borde
-                          ),
+                          borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(
-                            color: Colors
-                                .transparent, // Color del borde cuando no está enfocado
-                            width: 1.0,
-                          ),
+                          borderSide: const BorderSide(color: Colors.transparent, width: 1.0),
                         ),
                         hintText: 'Buscar ventas...',
                         hintStyle: TextStyle(color: Colors.grey[600]),
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 12.0),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
                       ),
-                      onChanged: (text) {
-                        // Aquí puedes añadir la lógica para filtrar la lista de ventas
-                      },
+                      onChanged: _filterVentas,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 10),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: ventas.length,
+                      itemCount: filteredVentas.length,
                       itemBuilder: (context, index) {
-                        final venta = ventas[index];
+                        final venta = filteredVentas[index];
                         final nombreServicio =
                             venta['servicio']['Nombre_Servicio'] ?? 'Producto';
                         final imageUrl = venta['servicio']['ImgServicio'] ?? '';
