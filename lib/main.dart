@@ -8,7 +8,7 @@ import 'package:primer_proyecto/Databasehelper.dart';
 import 'package:intl/intl.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de inicializar Flutter
+  WidgetsFlutterBinding.ensureInitialized(); 
   runApp(const MyApp());
 }
 
@@ -230,71 +230,66 @@ Future<void> _loadTopService() async {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color:
-                                  Colors.white, // Color de fondo del contenedor
-                              borderRadius: BorderRadius.circular(
-                                  15), // Bordes redondeados
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black
-                                      .withOpacity(0.2), // Color de la sombra
-                                  spreadRadius:
-                                      2, // Radio de expansión de la sombra
-                                  blurRadius: 5, // Difuminado de la sombra
-                                  offset: const Offset(
-                                      0, 3), // Desplazamiento de la sombra
-                                ),
-                              ],
-                            ),
-                           child: topService == null
-                            ? const Center(child: CircularProgressIndicator())
-                            : Card(
-                                elevation: 0, // Desactiva la sombra predeterminada del Card
-                                margin: EdgeInsets.zero, // Elimina el margen del Card
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                        child: Text(
-                                          'Técnica más vendida',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
+                       Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: topService == null
+                              ? const Center(child: CircularProgressIndicator())
+                              : Card(
+                                  elevation: 0,
+                                  margin: EdgeInsets.zero,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Center(
+                                          child: Text(
+                                            'Técnica más vendida',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 15,
-                                            backgroundImage: NetworkImage(topService!['ImgServicio']),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          SizedBox(
-                                            width: 200,  
-                                            child: Text(
-                                              topService!['Nombre_Servicio'] ?? 'Nombre del servicio',
-                                              style: const TextStyle(fontSize: 17),
-                                              softWrap: true,
-                                              overflow: TextOverflow.visible,
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 15,
+                                              backgroundImage: NetworkImage(topService!['ImgServicio']),
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                    ],
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                topService!['Nombre_Servicio'] ?? 'Nombre del servicio',
+                                                style: const TextStyle(fontSize: 17),
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2, // Permite hasta dos líneas de texto
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-
-                          ),
                         ),
+                      ),
+
                       ],
                     ),
                   ),
@@ -373,7 +368,7 @@ Future<void> _loadTopService() async {
                       onChanged: _filterVentas,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 36),
                   Expanded(
                     child: ListView.builder(
                       itemCount: filteredVentas.length,

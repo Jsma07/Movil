@@ -116,20 +116,39 @@ class _CrearVentaState extends State<CrearVenta> {
   }
 
   final formatCurrency = NumberFormat.currency(locale: 'es_CO', symbol: '\$');
+Future<void> _guardarVenta(BuildContext context) async {
+  if (_formKey.currentState!.validate()) {
+    // Mostrar alerta de confirmación antes de guardar
+    final shouldSave = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmación'),
+          content: const Text('¿Estás seguro de que deseas guardar la venta?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Confirmar'),
+            ),
+          ],
+        );
+      },
+    );
 
-  Future<void> _guardarVenta(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
+    if (shouldSave == true) {
       try {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? token = prefs.getString('authToken');
         print('Token recuperado: $token');
 
         if (token == null) {
-          print('Error: No se encontró el token');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                  'Error de autenticación. Intente iniciar sesión de nuevo.'),
+              content: Text('Error de autenticación. Intente iniciar sesión de nuevo.'),
             ),
           );
           return;
@@ -138,10 +157,6 @@ class _CrearVentaState extends State<CrearVenta> {
         double subtotal = _calcularSubtotal();
         double descuento = _calcularDescuento(subtotal);
         double total = subtotal - descuento;
-
-        print('Subtotal: $subtotal');
-        print('Descuento: $descuento');
-        print('Total: $total');
 
         Venta nuevaVenta = Venta(
           empleadoId: _empleadoId!,
@@ -155,7 +170,7 @@ class _CrearVentaState extends State<CrearVenta> {
         );
 
         final response = await http.post(
-          Uri.parse('http://192.168.18.89:5000/Jackenail/RegistrarVenta'),
+          Uri.parse('http://192.168.137.1:5000/Jackenail/RegistrarVenta'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
@@ -164,14 +179,26 @@ class _CrearVentaState extends State<CrearVenta> {
         );
 
         if (response.statusCode == 201) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Venta registrada correctamente'),
-            ),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MyHomePage()),
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Éxito'),
+                content: const Text('Venta agregada con éxito'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MyHomePage()),
+                      );
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
           );
         } else {
           throw Exception('Error al registrar la venta');
@@ -186,6 +213,7 @@ class _CrearVentaState extends State<CrearVenta> {
       }
     }
   }
+}
 
   void _actualizarTotal() {
     double subtotal = _calcularSubtotal();

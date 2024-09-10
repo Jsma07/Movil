@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseHelper {
-  final String baseUrl = 'http://192.168.18.89:5000';
+  final String baseUrl = 'http://192.168.137.1:5000';
 
   Future<String?> login(String email, String password) async {
     try {
@@ -162,24 +162,24 @@ class DatabaseHelper {
     }
   }
 
-  Future<Map<String, dynamic>> getTopService() async {
+Future<Map<String, dynamic>> getTopService() async {
   try {
     final response = await http.get(Uri.parse('$baseUrl/api/serviciomasvendido'));
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      if (data.isNotEmpty) {
-        // Obtén el primer servicio de la lista
-        final Map<String, dynamic> topService = data[0];
+      // Parsear la respuesta JSON directamente como un objeto Map
+      final Map<String, dynamic> topService = json.decode(response.body);
+
+      if (topService.isNotEmpty) {
         return topService;
       } else {
         throw Exception('No hay servicios disponibles.');
       }
     } else {
-      throw Exception('Error al cargar los servicios: Estado ${response.statusCode}');
+      throw Exception('Error al cargar el servicio: Estado ${response.statusCode}');
     }
   } catch (e) {
-    throw Exception('Error al procesar la respuesta de los servicios: $e');
+    throw Exception('Error al procesar la respuesta del servicio: $e');
   }
 }
 
