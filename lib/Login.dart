@@ -214,18 +214,7 @@ class _LoginState extends State<Login> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '¿Olvidó su contraseña? ',
-                                  ),
-                                  Text(
-                                    'Recuperar',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ],
-                              ),
+                              
                             ],
                           ),
                         ),

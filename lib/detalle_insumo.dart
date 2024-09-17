@@ -174,7 +174,7 @@ class DetalleInsumo extends StatelessWidget {
                               final adicion =
                                   adiciones[index] as Map<String, dynamic>;
                               final imgUrl =
-                                  'http://192.168.100.44:5000/uploads/${adicion['Img'] ?? ''}';
+                                  'https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/uploads/${adicion['Img'] ?? ''}';
                               return Container(
                                 width: 150,
                                 margin:

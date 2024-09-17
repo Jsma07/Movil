@@ -241,11 +241,25 @@ Future<void> _guardarVenta(BuildContext context) async {
 
     double precioServicio = 0.0;
 
-    if (servicioSeleccionado.containsKey('Precio_Servicio')) {
-      String precioString = servicioSeleccionado['Precio_Servicio'];
-      precioString = precioString.replaceAll('.', '').replaceAll(',', '.');
+   if (servicioSeleccionado.containsKey('Precio_Servicio')) {
+    var precio = servicioSeleccionado['Precio_Servicio'];
+
+    if (precio is String) {
+      // Si el valor es una cadena, realiza la conversión de formato
+      String precioString = precio.replaceAll('.', '').replaceAll(',', '.');
       precioServicio = double.tryParse(precioString) ?? 0.0;
+    } else if (precio is int) {
+      // Si el valor es un entero, conviértelo a double directamente
+      precioServicio = precio.toDouble();
+    } else if (precio is double) {
+      // Si el valor ya es un double, simplemente asígnalo
+      precioServicio = precio;
+    } else {
+      // Maneja otros tipos o casos de error
+      print('Tipo inesperado para Precio_Servicio: ${precio.runtimeType}');
+      precioServicio = 0.0;
     }
+  }
 
     print('Subtotal calculado: $precioServicio');
     return precioServicio;
@@ -266,65 +280,70 @@ Future<void> _guardarVenta(BuildContext context) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30.0),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromARGB(230, 204, 160, 211),
-                    Color.fromARGB(255, 255, 255, 255),
-                  ],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(
-                        0, 3), // cambios de posición de la sombra en el eje y
-                  ),
+      appBar:  AppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      flexibleSpace: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
+          child: Container(
+          
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(40.0),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.fromARGB(255, 132, 241, 255),
+                  Color.fromARGB(255, 250, 250, 250),
                 ],
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    CircleAvatar(
-                      radius: 23,
-                      backgroundImage: NetworkImage(
-                          'https://i.pinimg.com/564x/85/53/5e/85535e2d471e0f036ae4492327581c3e.jpg'),
-                    ),
-                    Text(
-                      'Jake Nails',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    CircleAvatar(
-                      radius: 23,
-                      backgroundImage: NetworkImage(
-                          'https://i.pinimg.com/236x/1e/56/aa/1e56aa733e30dc0fd59a72182c8a7df9.jpg'),
-                    ),
-                  ],
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromARGB(58, 68, 68, 68).withOpacity(0.2),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3),
                 ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                children: <Widget>[
+                  // Avatar izquierdo
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage('https://i.pinimg.com/736x/d5/8a/f4/d58af48f25d5a8df2854463c83e2f2e8.jpg'),
+                  ),
+                  // Spacer para empujar el texto hacia la izquierda
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(width: 75.0), // Ajusta el espacio entre el avatar y el texto
+                        Text(
+                          'Jake Nails',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Avatar derecho (opcional)
+                  
+                ],
               ),
             ),
           ),
         ),
       ),
+    ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -385,23 +404,7 @@ Future<void> _guardarVenta(BuildContext context) async {
                             ),
                           ),
                         ),
-                        SizedBox(
-                          width: 120,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Adiciones()),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 252, 253, 254),
-                            ),
-                            child: const Text('Adiciones'),
-                          ),
-                        ),
+                       
                       ],
                     ),
                     const SizedBox(
@@ -413,130 +416,129 @@ Future<void> _guardarVenta(BuildContext context) async {
                         children: [
                           const SizedBox(height: 10),
                           // Nombre del Servicio
-                          DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              hintText: 'Servicio',
-                              hintStyle:
-                                  const TextStyle(fontWeight: FontWeight.w600),
-                              prefixIcon: const Icon(Icons.local_atm),
-                              fillColor: Colors.grey.shade200,
-                              filled: true,
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                            items: servicios.map((servicios) {
-                              return DropdownMenuItem<String>(
-                                value: servicios['Nombre_Servicio'],
-                                child: Text(servicios['Nombre_Servicio']),
-                              );
-                            }).toList(),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor seleccione el nombre del servicio';
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              setState(() {
-                                _servicioId = servicios.firstWhere((serv) =>
-                                    serv['Nombre_Servicio'] ==
-                                    value)['IdServicio'];
-                                _actualizarTotal();
-                              });
-                            },
-                          ),
+                        DropdownButtonFormField<String>(
+  decoration: InputDecoration(
+    hintText: 'Servicio',
+    hintStyle: const TextStyle(fontWeight: FontWeight.w600),
+    prefixIcon: const Icon(Icons.local_atm),
+    fillColor: Colors.grey.shade200,
+    filled: true,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(25),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(25),
+    ),
+  ),
+  items: servicios.where((servicio) =>
+    servicio['EstadoServicio'] == 1
+  ).map((servicio) {
+    return DropdownMenuItem<String>(
+      value: servicio['Nombre_Servicio'],
+      child: Text(servicio['Nombre_Servicio']),
+    );
+  }).toList(),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor seleccione el nombre del servicio';
+    }
+    return null;
+  },
+  onChanged: (value) {
+    setState(() {
+      _servicioId = servicios.firstWhere((serv) =>
+        serv['Nombre_Servicio'] == value && serv['EstadoServicio'] == 1
+      )['IdServicio'];
+      _actualizarTotal();
+    });
+  },
+),
+
                           const SizedBox(height: 25),
                           // Nombre del Empleado
                           DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              hintText: 'Manicurista',
-                              hintStyle:
-                                  const TextStyle(fontWeight: FontWeight.w600),
-                              prefixIcon: const Icon(Icons.business),
-                              fillColor: Colors.grey.shade200,
-                              filled: true,
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                            items: empleados.map((empleado) {
-                              return DropdownMenuItem<String>(
-                                value: empleado['Nombre'] ?? '',
-                                child: Text(empleado['Nombre'] ?? ''),
-                              );
-                            }).toList(),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor seleccione el nombre del empleado';
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              setState(() {
-                                _empleadoId = empleados.firstWhere((emp) =>
-                                    emp['Nombre'] == value)['IdEmpleado'];
-                              });
-                            },
-                            onSaved: (value) {
-                              _empleadoId = empleados.firstWhere((emp) =>
-                                  emp['Nombre'] == value)['IdEmpleado'];
-                            },
-                          ),
+  decoration: InputDecoration(
+    hintText: 'Manicurista',
+    hintStyle: const TextStyle(fontWeight: FontWeight.w600),
+    prefixIcon: const Icon(Icons.account_circle),
+    fillColor: Colors.grey.shade200,
+    filled: true,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(25),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(25),
+    ),
+  ),
+  items: empleados.where((empleado) =>
+    empleado['Estado'] == 1 && empleado['IdRol'] == 2
+  ).map((empleado) {
+    return DropdownMenuItem<String>(
+      value: empleado['IdCliente'].toString(),
+      child: Text('${empleado['Nombre']} ${empleado['Apellido'] ?? ''}'),
+    );
+  }).toList(),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor seleccione el nombre del cliente';
+    }
+    return null;
+  },
+  onChanged: (value) {
+    _clienteId = int.parse(value!);
+  },
+  onSaved: (value) {
+    _clienteId = int.parse(value!);
+  },
+),
+
                           const SizedBox(height: 25),
                           // Nombre del Cliente
-                          DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              hintText: 'Cliente',
-                              hintStyle:
-                                  const TextStyle(fontWeight: FontWeight.w600),
-                              prefixIcon: const Icon(Icons.account_circle),
-                              fillColor: Colors.grey.shade200,
-                              filled: true,
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                            items: clientes.map((cliente) {
-                              return DropdownMenuItem<String>(
-                                value: cliente['IdCliente'].toString(),
-                                child: Text(cliente['Nombre'] ?? ''),
-                              );
-                            }).toList(),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor seleccione el nombre del cliente';
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              _clienteId = int.parse(value!);
-                            },
-                            onSaved: (value) {
-                              _clienteId = int.parse(value!);
-                            },
-                          ),
+                        DropdownButtonFormField<String>(
+  decoration: InputDecoration(
+    hintText: 'Cliente',
+    hintStyle: const TextStyle(fontWeight: FontWeight.w600),
+    prefixIcon: const Icon(Icons.account_circle),
+    fillColor: Colors.grey.shade200,
+    filled: true,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(25),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(25),
+    ),
+  ),
+  items: clientes.where((cliente) =>
+    cliente['Estado'] == 1
+  ).map((cliente) {
+    return DropdownMenuItem<String>(
+      value: cliente['IdCliente'].toString(),
+      child: Text('${cliente['Nombre']} ${cliente['Apellido'] ?? ''}'),
+    );
+  }).toList(),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor seleccione el nombre del cliente';
+    }
+    return null;
+  },
+  onChanged: (value) {
+    _clienteId = int.parse(value!);
+  },
+  onSaved: (value) {
+    _clienteId = int.parse(value!);
+  },
+),
+
                           const SizedBox(height: 25),
                           // Campo para Descuento
                           TextFormField(

@@ -388,7 +388,7 @@ Future<void> _loadTopService() async {
 
                         // Construye la URL completa de la imagen
                         final validImageUrl = imageUrl.isNotEmpty
-                            ? 'http://192.168.100.44:5000$imageUrl'
+                            ? 'https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev$imageUrl'
                             : 'https://i.pinimg.com/736x/07/e1/44/07e14409b709e67cac82a1aa87ecca53.jpg';
 
                         return buildSalesListItem(

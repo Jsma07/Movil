@@ -4,17 +4,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     Key? key,
     this.backgroundColor = Colors.transparent,
-    this.textColor = Colors.white,
+    this.textColor = Colors.black,
     this.leftAvatarImageUrl =
-        'https://i.pinimg.com/564x/85/53/5e/85535e2d471e0f036ae4492327581c3e.jpg',
-    this.rightAvatarImageUrl =
-        'https://i.pinimg.com/236x/1e/56/aa/1e56aa733e30dc0fd59a72182c8a7df9.jpg',
+        'https://i.pinimg.com/736x/d5/8a/f4/d58af48f25d5a8df2854463c83e2f2e8.jpg',
+    this.rightAvatarImageUrl,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color textColor;
   final String leftAvatarImageUrl;
-  final String rightAvatarImageUrl;
+  final String? rightAvatarImageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -24,22 +23,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       flexibleSpace: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
           child: Container(
+          
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30.0),
+              borderRadius: BorderRadius.circular(40.0),
               gradient: const LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color.fromARGB(230, 204, 160, 211),
-                  Color.fromARGB(255, 255, 255, 255),
+                  Color.fromARGB(255, 132, 241, 255),
+                  Color.fromARGB(255, 250, 250, 250),
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
+                  color: Color.fromARGB(58, 68, 68, 68).withOpacity(0.2),
                   spreadRadius: 5,
                   blurRadius: 7,
                   offset: const Offset(0, 3),
@@ -49,24 +49,35 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
+                  // Avatar izquierdo
                   CircleAvatar(
-                    radius: 23,
+                    radius: 30,
                     backgroundImage: NetworkImage(leftAvatarImageUrl),
                   ),
-                  Text(
-                    'Jake Nails',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
+                  // Spacer para empujar el texto hacia la izquierda
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(width: 75.0), // Ajusta el espacio entre el avatar y el texto
+                        Text(
+                          'Jake Nails',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  CircleAvatar(
-                    radius: 23,
-                    backgroundImage: NetworkImage(rightAvatarImageUrl),
-                  ),
+                  // Avatar derecho (opcional)
+                  if (rightAvatarImageUrl != null)
+                    CircleAvatar(
+                      radius: 23,
+                      backgroundImage: NetworkImage(rightAvatarImageUrl!),
+                    ),
                 ],
               ),
             ),
