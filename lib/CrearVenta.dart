@@ -170,7 +170,7 @@ Future<void> _guardarVenta(BuildContext context) async {
         );
 
         final response = await http.post(
-          Uri.parse('http://192.168.137.1:5000/Jackenail/RegistrarVenta'),
+          Uri.parse('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/RegistrarVenta'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',

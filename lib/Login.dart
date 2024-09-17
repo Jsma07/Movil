@@ -131,7 +131,7 @@ class _LoginState extends State<Login> {
                         ),
                         child: ClipOval(
                           child: Image.network(
-                            'https://i.pinimg.com/736x/f7/ce/e0/f7cee01bc6f7ebb3b40db04ed2d33904.jpg',
+                            'https://i.pinimg.com/736x/d5/8a/f4/d58af48f25d5a8df2854463c83e2f2e8.jpg',
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -319,7 +319,7 @@ class _PrincipalState extends State<Principal>
                 ),
                 child: ClipOval(
                   child: Image.network(
-                    'https://i.pinimg.com/736x/f7/ce/e0/f7cee01bc6f7ebb3b40db04ed2d33904.jpg',
+                    'https://i.pinimg.com/736x/d5/8a/f4/d58af48f25d5a8df2854463c83e2f2e8.jpg',
                     fit: BoxFit.cover,
                   ),
                 ),

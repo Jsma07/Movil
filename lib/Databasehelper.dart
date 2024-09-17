@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseHelper {
-  final String baseUrl = 'http://192.168.137.1:5000';
+  final String baseUrl = 'https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev';
 
   Future<String?> login(String email, String password) async {
     try {
